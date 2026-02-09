@@ -49,22 +49,22 @@ export const ScheduleList: React.FC<ScheduleListProps> = ({ schedule, records, o
 
   // Bold Black Minimalist Logic
   return (
-    <GlassCard className="overflow-hidden bg-surface border-border" noPadding>
+    <GlassCard className="overflow-hidden bg-surface border-border h-full flex flex-col" noPadding>
       {/* Date Navigation */}
-      <div className="flex items-center justify-between p-4 border-b border-border bg-zinc-50 dark:bg-black/20">
+      <div className="flex items-center justify-between p-4 border-b border-border bg-zinc-50 dark:bg-white/20 shrink-0">
         <button onClick={() => changeDate(-1)} className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-zinc-400 hover:text-text">
           <ChevronLeft className="h-5 w-5" />
         </button>
         <div className="text-center">
-          <div className="text-xs text-zinc-500 uppercase font-bold tracking-wider mb-0.5">{currentDayName}</div>
+          <div className="text-xs text-zinc-500 uppercase font-bold tracking-wider mb-0.5">Weekly Schedule</div>
           <motion.div
             key={selectedDate.toISOString()}
             initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-lg font-bold text-text"
+            className="text-lg font-bold text-text flex items-center gap-2"
           >
-            {selectedDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-            <span className="opacity-50 font-normal ml-1 hidden sm:inline">{selectedDate.getFullYear()}</span>
+            <span>{currentDayName},</span>
+            <span>{selectedDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
           </motion.div>
         </div>
         <button onClick={() => changeDate(1)} className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-zinc-400 hover:text-text">
@@ -73,9 +73,9 @@ export const ScheduleList: React.FC<ScheduleListProps> = ({ schedule, records, o
       </div>
 
       {/* Class List */}
-      <div className="divide-y divide-border">
+      <div className="divide-y divide-border flex-1 overflow-y-auto custom-scrollbar">
         {todaysClasses.length === 0 ? (
-          <div className="py-20 px-6 text-center text-zinc-500 flex flex-col items-center">
+          <div className="h-full flex flex-col items-center justify-center text-zinc-500 p-6">
             <div className="w-16 h-16 bg-black/5 dark:bg-white/5 rounded-full flex items-center justify-center mb-4">
               <Calendar className="h-8 w-8 opacity-30" />
             </div>
@@ -91,14 +91,13 @@ export const ScheduleList: React.FC<ScheduleListProps> = ({ schedule, records, o
               return (
                 <motion.div
                   layout
-                  initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 10 }}
                   transition={{
                     type: "spring",
-                    stiffness: 500,
-                    damping: 30,
-                    mass: 1,
+                    stiffness: 120,
+                    damping: 20,
                     delay: index * 0.05
                   }}
                   key={item.id}

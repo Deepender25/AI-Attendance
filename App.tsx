@@ -6,6 +6,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { Dashboard } from './Dashboard';
+import { Schedule } from './pages/Schedule';
 import { AppShell } from './components/layout/AppShell';
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
@@ -22,6 +23,13 @@ const App: React.FC = () => {
                     <Routes>
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
+                        <Route path="/schedule" element={
+                            <PrivateRoute>
+                                <AppShell>
+                                    <Schedule />
+                                </AppShell>
+                            </PrivateRoute>
+                        } />
                         <Route path="/" element={
                             <PrivateRoute>
                                 <AppShell>

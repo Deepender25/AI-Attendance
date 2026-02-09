@@ -1,5 +1,6 @@
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { BarChart } from 'lucide-react';
 import { OverallStats } from '../types';
 import { GlassCard } from './ui/GlassCard';
 import { motion } from 'framer-motion';
@@ -36,9 +37,9 @@ export const AttendanceStats: React.FC<AttendanceStatsProps> = ({ stats }) => {
 
         <div className="flex items-baseline justify-center">
           <motion.span
-            initial={{ scale: 0.5, opacity: 0 }}
+            initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: "spring", stiffness: 100 }}
+            transition={{ type: "spring", stiffness: 100, damping: 20 }}
             className="text-5xl lg:text-6xl font-bold text-text"
           >
             {hasData ? Math.round(stats.percentage) : 0}
@@ -59,47 +60,82 @@ export const AttendanceStats: React.FC<AttendanceStatsProps> = ({ stats }) => {
       </GlassCard>
 
       {/* Chart Card */}
-      <GlassCard className="flex-1 flex flex-col bg-surface border-border min-h-[220px]">
-        <h3 className="text-text font-semibold mb-2 text-center text-sm">Breakdown</h3>
+      <GlassCard className="flex-1 flex flex-col bg-surface border-border min-h-[280px]">
+        <h3 className="text-zinc-500 font-medium uppercase tracking-wide text-xs mb-4 text-center">Attendance Breakdown</h3>
         <div className="flex-1 w-full min-h-0">
           {hasData ? (
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <XAxis
-                  dataKey="name"
-                  tick={{ fill: isDark ? '#A1A1AA' : '#52525B', fontSize: 10 }}
-                  axisLine={false}
-                  tickLine={false}
-                  dy={5}
-                />
-                <YAxis
-                  tick={{ fill: isDark ? '#A1A1AA' : '#52525B', fontSize: 10 }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <Tooltip
-                  cursor={{ fill: isDark ? '#FFFFFF10' : '#00000005' }}
-                  contentStyle={{
-                    backgroundColor: isDark ? '#18181B' : '#FFFFFF',
-                    borderRadius: '8px',
-                    border: isDark ? '1px solid #27272A' : '1px solid #E4E4E7',
-                    color: isDark ? '#fff' : '#000',
-                    fontSize: '12px',
-                    padding: '8px 12px'
-                  }}
-                  itemStyle={{ color: isDark ? '#fff' : '#000' }}
-                />
-                <Bar dataKey="value" radius={[4, 4, 0, 0]} barSize={32}>
-                  {data.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+            <div className="flex flex-col md:flex-row items-center h-full gap-6 px-2">
+              {/* Donut Chart */}
+              <div className="w-full md:w-1/2 h-[180px] relative">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={data}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={80}
+                      paddingAngle={5}
+                      dataKey="value"
+                      cornerRadius={6}
+                      stroke="none"
+                    >
+                      {data.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      cursor={{ fill: 'transparent' }}
+                      contentStyle={{
+                        backgroundColor: isDark ? '#18181B' : '#FFFFFF',
+                        borderRadius: '12px',
+                        border: isDark ? '1px solid #27272A' : '1px solid #E4E4E7',
+                        color: isDark ? '#fff' : '#000',
+                        fontSize: '12px',
+                        padding: '8px 12px',
+                        boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                      }}
+                      itemStyle={{ color: isDark ? '#fff' : '#000' }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+                {/* Center Stats */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                  <span className="text-3xl font-bold text-text">{stats.totalClasses}</span>
+                  <span className="text-[10px] text-zinc-400 uppercase tracking-widest font-bold">Total</span>
+                </div>
+              </div>
+
+              {/* Custom Legend */}
+              <div className="w-full md:w-1/2 flex flex-col gap-3 pb-4 md:pb-0">
+                {data.map((item, index) => (
+                  <motion.div
+                    key={item.name}
+                    initial={{ opacity: 0, x: 10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1 + (index * 0.1) }}
+                    className="flex items-center justify-between p-3 rounded-xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors cursor-default"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-2.5 h-2.5 rounded-full shadow-sm" style={{ backgroundColor: item.color }} />
+                      <span className="font-medium text-text text-sm">{item.name}</span>
+                    </div>
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="font-bold text-text">{item.value}</span>
+                      <span className="text-xs text-zinc-400 font-medium">
+                        ({stats.totalClasses > 0 ? Math.round((item.value / stats.totalClasses) * 100) : 0}%)
+                      </span>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
           ) : (
             <div className="h-full flex flex-col items-center justify-center text-zinc-500 text-sm">
-              <div className="w-10 h-10 rounded-full bg-black/5 dark:bg-white/5 mb-2"></div>
-              <p className="text-xs">Mark attendance to see stats</p>
+              <div className="w-12 h-12 rounded-full bg-black/5 dark:bg-white/5 mb-3 flex items-center justify-center">
+                <BarChart className="w-6 h-6 opacity-20" />
+              </div>
+              <p className="text-xs font-medium opacity-70">Mark attendance to see stats</p>
             </div>
           )}
         </div>

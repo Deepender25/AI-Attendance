@@ -9,77 +9,52 @@ import { GlassCard } from './components/ui/GlassCard';
 import { motion } from 'framer-motion';
 
 export const Dashboard: React.FC = () => {
-    const { user } = useAuth();
-    const [schedule, setSchedule] = useState<ScheduleItem[]>([]);
-    const [records, setRecords] = useState<AttendanceRecord[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const { user, schedule, records, updateSchedule, updateRecords, isDataLoading } = useAuth();
     const [isSaving, setIsSaving] = useState(false);
 
-    // Load data from Backend
-    useEffect(() => {
-        if (!user) return;
-
-        fetch(`http://localhost:3001/api/data/${user.id}`)
-            .then(res => res.json())
-            .then(data => {
-                setSchedule(data.schedule || []);
-                setRecords(data.records || []);
-            })
-            .catch(err => console.error("Failed to load data", err))
-            .finally(() => setIsLoading(false));
-    }, [user]);
-
-    // Save data to Backend
-    const saveData = useCallback(async (newSchedule: ScheduleItem[], newRecords: AttendanceRecord[]) => {
-        if (!user) return;
+    const handleScheduleGenerated = async (newSchedule: ScheduleItem[]) => {
         setIsSaving(true);
-        try {
-            await fetch(`http://localhost:3001/api/data/${user.id}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ schedule: newSchedule, records: newRecords }),
-            });
-        } catch (err) {
-            console.error("Failed to save data", err);
-        } finally {
-            setIsSaving(false);
-        }
-    }, [user]);
-
-    const handleScheduleGenerated = (newSchedule: ScheduleItem[]) => {
-        setSchedule(newSchedule);
-        saveData(newSchedule, records);
+        await updateSchedule(newSchedule);
+        setIsSaving(false);
     };
 
-    const handleRecordUpdate = (newRecord: AttendanceRecord) => {
-        // Optimistic update
+    const handleRecordUpdate = async (newRecord: AttendanceRecord) => {
+        // Optimistic update logic is now conceptually handled by assuming updateRecords persists
+        // For smoother UX we might want to keep local optimistic logic or trust the Context update
+
         const updatedRecords = records.filter(r =>
             !(r.scheduleItemId === newRecord.scheduleItemId && r.date === newRecord.date)
         );
         const newRecordsList = [...updatedRecords, newRecord];
 
-        setRecords(newRecordsList);
-        saveData(schedule, newRecordsList);
+        // We don't need dedicated saving loading state here if context handles it, but let's keep isSaving for UI feedback
+        // if context update is awaited.
+        setIsSaving(true);
+        await updateRecords(newRecordsList);
+        setIsSaving(false);
     };
 
-    const handleRecordDelete = (scheduleId: string, date: string) => {
+    const handleRecordDelete = async (scheduleId: string, date: string) => {
         const updatedRecords = records.filter(r =>
             !(r.scheduleItemId === scheduleId && r.date === date)
         );
-        setRecords(updatedRecords);
-        saveData(schedule, updatedRecords);
+        setIsSaving(true);
+        await updateRecords(updatedRecords);
+        setIsSaving(false);
     };
 
-    const handleReset = () => {
+    const handleReset = async () => {
         if (confirm("Are you sure you want to clear all data? This cannot be undone.")) {
-            setSchedule([]);
-            setRecords([]);
-            saveData([], []);
+            setIsSaving(true);
+            await updateSchedule([]);
+            await updateRecords([]);
+            setIsSaving(false);
         }
     };
 
     // Calculate stats
     const stats: OverallStats = useMemo(() => {
+        // ... stats logic remains same ...
         const activeClasses = records.filter(r => r.status !== AttendanceStatus.CANCELLED);
         const totalClasses = activeClasses.length;
         const cancelledClasses = records.filter(r => r.status === AttendanceStatus.CANCELLED).length;
@@ -99,7 +74,7 @@ export const Dashboard: React.FC = () => {
         };
     }, [records]);
 
-    if (isLoading) {
+    if (isDataLoading && schedule.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh] text-white">
                 <RefreshCw className="w-8 h-8 animate-spin mb-4" />
@@ -164,10 +139,7 @@ export const Dashboard: React.FC = () => {
                         animate={{ opacity: 1, x: 0 }}
                         className="lg:col-span-2 h-auto lg:h-full flex flex-col overflow-hidden"
                     >
-                        <div className="flex items-center justify-between mb-4 shrink-0">
-                            <h2 className="text-xl font-bold text-text">Weekly Schedule</h2>
-                        </div>
-                        <div className="flex-1 lg:overflow-y-auto lg:pr-2 custom-scrollbar">
+                        <div className="flex-1 lg:overflow-y-auto lg:pr-2 custom-scrollbar h-full">
                             <ScheduleList
                                 schedule={schedule}
                                 records={records}
