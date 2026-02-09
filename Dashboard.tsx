@@ -111,7 +111,7 @@ export const Dashboard: React.FC = () => {
     const hasSchedule = schedule.length > 0;
 
     return (
-        <div className="h-full flex flex-col gap-6 p-2 md:p-0 overflow-y-auto md:overflow-hidden">
+        <div className="h-full flex flex-col gap-6 p-2 md:p-0 overflow-hidden">
             {/* Header Content */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
                 <div>
@@ -142,27 +142,18 @@ export const Dashboard: React.FC = () => {
             </div>
 
             {!hasSchedule ? (
-                <div className="flex-1 flex items-center justify-center">
-                    <GlassCard className="max-w-xl w-full text-center py-12 bg-surface border-border">
-                        <div className="mb-6 inline-flex p-4 rounded-full bg-black/5 dark:bg-white/5 text-text">
-                            <CalendarIcon className="w-8 h-8" />
-                        </div>
-                        <h2 className="text-2xl font-bold text-text mb-2">
-                            No Schedule Found
-                        </h2>
-                        <p className="text-zinc-500 mb-8 max-w-sm mx-auto">
-                            Upload your timetable image to get started. We'll extract your classes automatically.
-                        </p>
+                <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+                    <div className="flex-1 flex flex-col items-center justify-center p-4 overflow-y-auto">
                         <UploadSchedule onScheduleGenerated={handleScheduleGenerated} />
-                    </GlassCard>
+                    </div>
                 </div>
             ) : (
-                <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-3 gap-6 pb-20 md:pb-0">
+                <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-3 gap-6 pb-4 md:pb-0 overflow-y-auto lg:overflow-hidden">
                     {/* Stats Section - Takes 1 column on large screens */}
                     <motion.div
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className="lg:col-span-1 h-auto md:h-full md:overflow-y-auto pr-0 md:pr-2 custom-scrollbar"
+                        className="lg:col-span-1 h-auto lg:h-full lg:overflow-y-auto pr-0 lg:pr-2 custom-scrollbar flex flex-col gap-4"
                     >
                         <AttendanceStats stats={stats} />
                     </motion.div>
@@ -171,12 +162,12 @@ export const Dashboard: React.FC = () => {
                     <motion.div
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className="lg:col-span-2 h-auto md:h-full flex flex-col overflow-hidden"
+                        className="lg:col-span-2 h-auto lg:h-full flex flex-col overflow-hidden"
                     >
                         <div className="flex items-center justify-between mb-4 shrink-0">
                             <h2 className="text-xl font-bold text-text">Weekly Schedule</h2>
                         </div>
-                        <div className="flex-1 md:overflow-y-auto md:pr-2 custom-scrollbar">
+                        <div className="flex-1 lg:overflow-y-auto lg:pr-2 custom-scrollbar">
                             <ScheduleList
                                 schedule={schedule}
                                 records={records}

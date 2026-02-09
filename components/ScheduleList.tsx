@@ -120,36 +120,39 @@ export const ScheduleList: React.FC<ScheduleListProps> = ({ schedule, records, o
                     <h4 className="text-lg font-semibold text-text truncate pr-2">{item.subject}</h4>
                   </div>
 
-                  <div className="flex items-center gap-2 w-full md:w-auto z-10">
-                    <div className="grid grid-cols-3 gap-2 flex-1 md:flex-none">
+                  <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 w-full md:w-auto z-10 mt-3 md:mt-0">
+                    <div className="grid grid-cols-3 md:flex gap-2 flex-1 md:flex-none">
                       <Button
                         size="sm"
                         variant={status === AttendanceStatus.PRESENT ? 'primary' : 'secondary'}
                         onClick={() => handleStatusUpdate(item, AttendanceStatus.PRESENT)}
-                        className={`justify-center`}
+                        className={`justify-center flex-1 md:flex-none min-w-[32px]`}
+                        title="Present"
                       >
-                        <CheckCircle className={`h-4 w-4 lg:mr-2 ${status === AttendanceStatus.PRESENT ? 'text-background' : 'text-zinc-500'}`} />
-                        <span className="hidden lg:inline">Present</span>
+                        <CheckCircle className={`h-4 w-4 md:mr-2 ${status === AttendanceStatus.PRESENT ? 'text-background' : 'text-zinc-500'}`} />
+                        <span className="hidden md:inline">Present</span>
                       </Button>
 
                       <Button
                         size="sm"
                         variant={status === AttendanceStatus.ABSENT ? 'danger' : 'secondary'}
                         onClick={() => handleStatusUpdate(item, AttendanceStatus.ABSENT)}
-                        className={`justify-center`}
+                        className={`justify-center flex-1 md:flex-none min-w-[32px]`}
+                        title="Absent"
                       >
-                        <XCircle className={`h-4 w-4 lg:mr-2 ${status === AttendanceStatus.ABSENT ? 'text-red-500' : 'text-zinc-500'}`} />
-                        <span className="hidden lg:inline">Absent</span>
+                        <XCircle className={`h-4 w-4 md:mr-2 ${status === AttendanceStatus.ABSENT ? 'text-red-500' : 'text-zinc-500'}`} />
+                        <span className="hidden md:inline">Absent</span>
                       </Button>
 
                       <Button
                         size="sm"
                         variant={status === AttendanceStatus.CANCELLED ? 'outline' : 'secondary'}
                         onClick={() => handleStatusUpdate(item, AttendanceStatus.CANCELLED)}
-                        className={`justify-center ${status === AttendanceStatus.CANCELLED ? 'bg-zinc-100 dark:bg-zinc-800' : ''}`}
+                        className={`justify-center flex-1 md:flex-none min-w-[32px] ${status === AttendanceStatus.CANCELLED ? 'bg-zinc-100 dark:bg-zinc-800' : ''}`}
+                        title="Cancelled"
                       >
-                        <MinusCircle className={`h-4 w-4 lg:mr-2 ${status === AttendanceStatus.CANCELLED ? 'text-orange-500' : 'text-zinc-500'}`} />
-                        <span className="hidden lg:inline">Cancelled</span>
+                        <MinusCircle className={`h-4 w-4 md:mr-2 ${status === AttendanceStatus.CANCELLED ? 'text-orange-500' : 'text-zinc-500'}`} />
+                        <span className="hidden md:inline">Cancelled</span>
                       </Button>
 
                     </div>
