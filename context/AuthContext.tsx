@@ -31,6 +31,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const API_URL = import.meta.env.VITE_API_URL || '';
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
@@ -54,7 +56,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setLoading(false);
     }, []);
 
-    // Fetch Data when User changes
+    // Verify Data Loading Logic
     const fetchData = useCallback(async () => {
         if (!user) {
             setSchedule([]);
@@ -64,7 +66,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         setIsDataLoading(true);
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/data/${user.id}`);
+            const API_URL = import.meta.env.VITE_API_URL || '';
+            const res = await fetch(`${API_URL}/api/data/${user.id}`);
             const data = await res.json();
             setSchedule(data.schedule || []);
             setRecords(data.records || []);
@@ -82,7 +85,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const saveData = async (newSchedule: ScheduleItem[], newRecords: AttendanceRecord[]) => {
         if (!user) return;
         try {
-            await fetch(`${import.meta.env.VITE_API_URL}/api/data/${user.id}`, {
+            await fetch(`${API_URL}/api/data/${user.id}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ schedule: newSchedule, records: newRecords }),
@@ -105,7 +108,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const login = async (email: string, password: string) => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
+            const response = await fetch(`${API_URL}/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password }),
@@ -127,7 +130,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const sendOTP = async (email: string) => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/send-otp`, {
+            const response = await fetch(`${API_URL}/auth/send-otp`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email }),
@@ -145,7 +148,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const register = async (name: string, email: string, password: string, otp: string) => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/register`, {
+            const response = await fetch(`${API_URL}/auth/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, email, password, otp }),
@@ -175,7 +178,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const updatePassword = async (oldPassword: string, newPassword: string) => {
         if (!user) return;
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/update-password`, {
+            const response = await fetch(`${API_URL}/auth/update-password`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId: user.id, oldPassword, newPassword }),
@@ -194,7 +197,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const updateProfile = async (name: string) => {
         if (!user) return;
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/update-profile`, {
+            const response = await fetch(`${API_URL}/auth/update-profile`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId: user.id, name }),
@@ -218,7 +221,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const requestEmailUpdate = async (newEmail: string) => {
         if (!user) return;
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/request-email-update`, {
+            const response = await fetch(`${API_URL}/auth/request-email-update`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId: user.id, newEmail }),
@@ -237,7 +240,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const verifyEmailUpdate = async (otp: string) => {
         if (!user) return;
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/verify-email-update`, {
+            const response = await fetch(`${API_URL}/auth/verify-email-update`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId: user.id, otp }),
