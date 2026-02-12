@@ -66,7 +66,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         setIsDataLoading(true);
         try {
-            const API_URL = import.meta.env.VITE_API_URL || '';
             const res = await fetch(`${API_URL}/api/data/${user.id}`);
             const data = await res.json();
             setSchedule(data.schedule || []);
