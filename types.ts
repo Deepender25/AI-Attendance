@@ -13,6 +13,20 @@ export interface ScheduleItem {
   endTime: string;
   subject: string;
   room?: string;
+  group?: string; // e.g., "A", "Batch 1"
+  weekPattern?: string; // e.g., "odd", "even", "week 1-5"
+}
+
+export interface AmbiguityQuestion {
+  id: string;
+  text: string; // "I see both Group A and Group B..."
+  options: string[]; // ["Group A", "Group B"]
+  key: keyof ScheduleItem; // The field this question resolves (e.g., 'group')
+}
+
+export interface ParsedScheduleResponse {
+  schedule: ScheduleItem[];
+  questions: AmbiguityQuestion[];
 }
 
 export interface AttendanceRecord {
@@ -35,4 +49,5 @@ export interface OverallStats {
   totalClasses: number;
   attendedClasses: number; // Present + Late (maybe weighted)
   missedClasses: number;
+  cancelledClasses: number;
 }

@@ -1,22 +1,23 @@
 import React, { useState } from 'react';
-import { Calendar, ChevronLeft, ChevronRight, CheckCircle, XCircle, Clock, MapPin } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, CheckCircle, XCircle, Clock, MapPin, X, MinusCircle } from 'lucide-react';
 import { ScheduleItem, AttendanceRecord, AttendanceStatus } from '../types';
 import { Button } from './ui/Button';
+import { GlassCard } from './ui/GlassCard';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface ScheduleListProps {
   schedule: ScheduleItem[];
   records: AttendanceRecord[];
   onUpdateRecord: (record: AttendanceRecord) => void;
+  onDeleteRecord?: (scheduleId: string, date: string) => void;
 }
 
-export const ScheduleList: React.FC<ScheduleListProps> = ({ schedule, records, onUpdateRecord }) => {
+export const ScheduleList: React.FC<ScheduleListProps> = ({ schedule, records, onUpdateRecord, onDeleteRecord }) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  
-  // Format selected date to match schedule days
+
   const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const currentDayName = days[selectedDate.getDay()];
-  
-  // Filter classes for the selected day
+
   const todaysClasses = schedule
     .filter(item => item.day.toLowerCase() === currentDayName.toLowerCase())
     .sort((a, b) => a.startTime.localeCompare(b.startTime));
@@ -29,7 +30,7 @@ export const ScheduleList: React.FC<ScheduleListProps> = ({ schedule, records, o
   const handleStatusUpdate = (scheduleItem: ScheduleItem, status: AttendanceStatus) => {
     const dateStr = selectedDate.toISOString().split('T')[0];
     const existing = getRecordForClass(scheduleItem.id);
-    
+
     const newRecord: AttendanceRecord = {
       id: existing ? existing.id : crypto.randomUUID(),
       scheduleItemId: scheduleItem.id,
@@ -46,93 +47,138 @@ export const ScheduleList: React.FC<ScheduleListProps> = ({ schedule, records, o
     setSelectedDate(newDate);
   };
 
+  // Bold Black Minimalist Logic
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <GlassCard className="overflow-hidden bg-surface border-border h-full flex flex-col" noPadding>
       {/* Date Navigation */}
-      <div className="flex items-center justify-between p-3 sm:p-4 border-b bg-gray-50">
-        <button onClick={() => changeDate(-1)} className="p-2 hover:bg-gray-200 rounded-full transition-colors active:bg-gray-300">
-          <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6 text-gray-600" />
+      <div className="flex items-center justify-between p-4 border-b border-border bg-zinc-50 dark:bg-white/20 shrink-0">
+        <button onClick={() => changeDate(-1)} className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-zinc-400 hover:text-text">
+          <ChevronLeft className="h-5 w-5" />
         </button>
         <div className="text-center">
-          <div className="text-xs sm:text-sm text-gray-500 uppercase font-semibold">{currentDayName}</div>
-          <div className="text-base sm:text-lg font-bold text-gray-900">
-            {selectedDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-            <span className="hidden sm:inline">, {selectedDate.getFullYear()}</span>
-          </div>
+          <div className="text-xs text-zinc-500 uppercase font-bold tracking-wider mb-0.5">Weekly Schedule</div>
+          <motion.div
+            key={selectedDate.toISOString()}
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-lg font-bold text-text flex items-center gap-2"
+          >
+            <span>{currentDayName},</span>
+            <span>{selectedDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
+          </motion.div>
         </div>
-        <button onClick={() => changeDate(1)} className="p-2 hover:bg-gray-200 rounded-full transition-colors active:bg-gray-300">
-          <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-gray-600" />
+        <button onClick={() => changeDate(1)} className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-zinc-400 hover:text-text">
+          <ChevronRight className="h-5 w-5" />
         </button>
       </div>
 
       {/* Class List */}
-      <div className="divide-y divide-gray-100">
+      <div className="divide-y divide-border flex-1 overflow-y-auto custom-scrollbar">
         {todaysClasses.length === 0 ? (
-          <div className="py-16 px-6 text-center text-gray-400 flex flex-col items-center">
-            <Calendar className="h-12 w-12 mb-3 opacity-50" />
-            <p className="text-sm sm:text-base">No classes scheduled for this day.</p>
+          <div className="h-full flex flex-col items-center justify-center text-zinc-500 p-6">
+            <div className="w-16 h-16 bg-black/5 dark:bg-white/5 rounded-full flex items-center justify-center mb-4">
+              <Calendar className="h-8 w-8 opacity-30" />
+            </div>
+            <p className="font-medium">No classes scheduled</p>
+            <p className="text-sm opacity-50">Enjoy your free time!</p>
           </div>
         ) : (
-          todaysClasses.map((item) => {
-            const record = getRecordForClass(item.id);
-            const status = record?.status;
+          <AnimatePresence mode='popLayout'>
+            {todaysClasses.map((item, index) => {
+              const record = getRecordForClass(item.id);
+              const status = record?.status;
 
-            return (
-              <div key={item.id} className="p-4 hover:bg-gray-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-center text-xs sm:text-sm text-gray-500 mb-1 gap-y-1">
-                    <div className="flex items-center mr-4">
-                      <Clock className="h-3.5 w-3.5 mr-1.5" />
-                      {item.startTime} - {item.endTime}
+              return (
+                <motion.div
+                  layout
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 10 }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 120,
+                    damping: 20,
+                    delay: index * 0.05
+                  }}
+                  key={item.id}
+                  className="p-5 hover:bg-black/5 dark:hover:bg-white/5 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4 group relative overflow-hidden"
+                >
+                  <div className="flex-1 min-w-0 z-10">
+                    <div className="flex flex-wrap items-center text-xs font-medium text-zinc-500 mb-1.5 gap-y-1">
+                      <div className="flex items-center mr-4 px-2 py-0.5 rounded-md bg-black/5 dark:bg-white/5 text-zinc-400">
+                        <Clock className="h-3 w-3 mr-1.5" />
+                        {item.startTime} - {item.endTime}
+                      </div>
+                      {item.room && (
+                        <div className="flex items-center px-2 py-0.5">
+                          <MapPin className="h-3 w-3 mr-1" />
+                          {item.room}
+                        </div>
+                      )}
                     </div>
-                    {item.room && (
-                      <div className="flex items-center bg-gray-100 px-2 py-0.5 rounded text-xs">
-                        <MapPin className="h-3 w-3 mr-1" />
-                        {item.room}
+                    <h4 className="text-lg font-semibold text-text truncate pr-2">{item.subject}</h4>
+                  </div>
+
+                  <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 w-full md:w-auto z-10 mt-3 md:mt-0">
+                    <div className="grid grid-cols-3 md:flex gap-2 flex-1 md:flex-none">
+                      <Button
+                        size="sm"
+                        variant={status === AttendanceStatus.PRESENT ? 'primary' : 'secondary'}
+                        onClick={() => handleStatusUpdate(item, AttendanceStatus.PRESENT)}
+                        className={`justify-center flex-1 md:flex-none min-w-[32px]`}
+                        title="Present"
+                      >
+                        <CheckCircle className={`h-4 w-4 md:mr-2 ${status === AttendanceStatus.PRESENT ? 'text-background' : 'text-zinc-500'}`} />
+                        <span className="hidden md:inline">Present</span>
+                      </Button>
+
+                      <Button
+                        size="sm"
+                        variant={status === AttendanceStatus.ABSENT ? 'danger' : 'secondary'}
+                        onClick={() => handleStatusUpdate(item, AttendanceStatus.ABSENT)}
+                        className={`justify-center flex-1 md:flex-none min-w-[32px]`}
+                        title="Absent"
+                      >
+                        <XCircle className={`h-4 w-4 md:mr-2 ${status === AttendanceStatus.ABSENT ? 'text-red-500' : 'text-zinc-500'}`} />
+                        <span className="hidden md:inline">Absent</span>
+                      </Button>
+
+                      <Button
+                        size="sm"
+                        variant={status === AttendanceStatus.CANCELLED ? 'outline' : 'secondary'}
+                        onClick={() => handleStatusUpdate(item, AttendanceStatus.CANCELLED)}
+                        className={`justify-center flex-1 md:flex-none min-w-[32px] ${status === AttendanceStatus.CANCELLED ? 'bg-zinc-100 dark:bg-zinc-800' : ''}`}
+                        title="Cancelled"
+                      >
+                        <MinusCircle className={`h-4 w-4 md:mr-2 ${status === AttendanceStatus.CANCELLED ? 'text-orange-500' : 'text-zinc-500'}`} />
+                        <span className="hidden md:inline">Cancelled</span>
+                      </Button>
+
+                    </div>
+
+                    {/* Reset Button - Moved outside the grid for visibility */}
+                    {status && onDeleteRecord && (
+                      <div className="flex justify-end mt-2 md:mt-0 md:ml-2">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => onDeleteRecord(item.id, selectedDate.toISOString().split('T')[0])}
+                          className="px-2 text-zinc-400 hover:text-red-500 hover:bg-red-500/10 transition-colors"
+                          title="Reset / Clear Status"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
                       </div>
                     )}
-                  </div>
-                  <h4 className="text-base sm:text-lg font-semibold text-gray-900 truncate pr-2">{item.subject}</h4>
-                </div>
 
-                <div className="flex items-center gap-2 w-full sm:w-auto">
-                  <div className="grid grid-cols-2 gap-2 flex-1 sm:flex-none">
-                    <Button 
-                      variant={status === AttendanceStatus.PRESENT ? 'primary' : 'secondary'}
-                      onClick={() => handleStatusUpdate(item, AttendanceStatus.PRESENT)}
-                      className={`justify-center ${status === AttendanceStatus.PRESENT ? "bg-green-600 hover:bg-green-700" : ""}`}
-                      title="Mark Present"
-                    >
-                      <CheckCircle className={`h-4 w-4 sm:h-5 sm:w-5 ${status === AttendanceStatus.PRESENT ? 'text-white' : 'text-green-600'}`} />
-                      <span className="ml-2">Present</span>
-                    </Button>
-                    
-                    <Button 
-                      variant={status === AttendanceStatus.ABSENT ? 'danger' : 'secondary'}
-                      onClick={() => handleStatusUpdate(item, AttendanceStatus.ABSENT)}
-                      className={`justify-center ${status === AttendanceStatus.ABSENT ? "" : "text-red-600"}`}
-                      title="Mark Absent"
-                    >
-                      <XCircle className={`h-4 w-4 sm:h-5 sm:w-5 ${status === AttendanceStatus.ABSENT ? 'text-white' : 'text-red-600'}`} />
-                      <span className="ml-2">Absent</span>
-                    </Button>
+                    {/* Legacy button removed */}
                   </div>
-
-                  <Button
-                     variant='ghost'
-                     onClick={() => handleStatusUpdate(item, AttendanceStatus.CANCELLED)}
-                     className={`text-xs px-2 min-w-[2.5rem] ${status === AttendanceStatus.CANCELLED ? 'bg-gray-200' : ''}`}
-                     title="Mark Cancelled"
-                  >
-                     <span className="hidden sm:inline">Cancelled</span>
-                     <span className="sm:hidden">❌</span>
-                  </Button>
-                </div>
-              </div>
-            );
-          })
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
         )}
       </div>
-    </div>
+    </GlassCard >
   );
 };

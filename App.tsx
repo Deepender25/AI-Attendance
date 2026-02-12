@@ -1,102 +1,59 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Layout } from './components/Layout';
-import { UploadSchedule } from './components/UploadSchedule';
-import { ScheduleList } from './components/ScheduleList';
-import { AttendanceStats } from './components/AttendanceStats';
-import { ScheduleItem, AttendanceRecord, AttendanceStatus, OverallStats } from './types';
-import * as storage from './utils/storage';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
+import { Login } from './pages/Login';
+import { Register } from './pages/Register';
+import { Dashboard } from './Dashboard';
+import { Schedule } from './pages/Schedule';
+import { AppShell } from './components/layout/AppShell';
+import { Settings } from './pages/Settings';
+
+const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
+    const { isAuthenticated, loading } = useAuth();
+    if (loading) return <div className="p-10 text-center">Loading session...</div>;
+    return isAuthenticated ? children : <Navigate to="/login" />;
+};
 
 const App: React.FC = () => {
-  const [schedule, setSchedule] = useState<ScheduleItem[]>([]);
-  const [records, setRecords] = useState<AttendanceRecord[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+    return (
+        <AuthProvider>
+            <ThemeProvider>
+                <Router>
+                    <Routes>
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/register" element={<Register />} />
 
-  // Load data on mount
-  useEffect(() => {
-    const loadedSchedule = storage.getSchedule();
-    const loadedRecords = storage.getRecords();
-    setSchedule(loadedSchedule);
-    setRecords(loadedRecords);
-    setIsLoading(false);
-  }, []);
+                        <Route path="/" element={
+                            <PrivateRoute>
+                                <AppShell>
+                                    <Dashboard />
+                                </AppShell>
+                            </PrivateRoute>
+                        } />
 
-  const handleScheduleGenerated = (newSchedule: ScheduleItem[]) => {
-    setSchedule(newSchedule);
-    storage.saveSchedule(newSchedule);
-  };
+                        <Route path="/schedule" element={
+                            <PrivateRoute>
+                                <AppShell>
+                                    <Schedule />
+                                </AppShell>
+                            </PrivateRoute>
+                        } />
 
-  const handleRecordUpdate = (newRecord: AttendanceRecord) => {
-    setRecords(prev => {
-      // Remove existing record for this specific class on this date if exists
-      const filtered = prev.filter(r => 
-        !(r.scheduleItemId === newRecord.scheduleItemId && r.date === newRecord.date)
-      );
-      const updated = [...filtered, newRecord];
-      storage.saveRecords(updated);
-      return updated;
-    });
-  };
+                        <Route path="/settings" element={
+                            <PrivateRoute>
+                                <AppShell>
+                                    <Settings />
+                                </AppShell>
+                            </PrivateRoute>
+                        } />
 
-  const handleReset = () => {
-    storage.clearAllData();
-    setSchedule([]);
-    setRecords([]);
-  };
-
-  // Calculate stats
-  const stats: OverallStats = useMemo(() => {
-    const totalClasses = records.filter(r => r.status !== AttendanceStatus.CANCELLED).length;
-    const attendedClasses = records.filter(r => 
-      r.status === AttendanceStatus.PRESENT || r.status === AttendanceStatus.LATE
-    ).length;
-    
-    // Simple percentage. 
-    // Note: This calculates percentage based on *recorded* classes.
-    // Ideally, you might want to calculate based on *past potential* classes, but that requires complex date logic.
-    // For this MVP, we calculate based on user input.
-    
-    const percentage = totalClasses > 0 ? (attendedClasses / totalClasses) * 100 : 100;
-
-    return {
-      totalClasses,
-      attendedClasses,
-      missedClasses: totalClasses - attendedClasses,
-      percentage
-    };
-  }, [records]);
-
-  if (isLoading) {
-    return <div className="flex items-center justify-center min-h-screen bg-gray-50 text-indigo-600">Loading AttendAI...</div>;
-  }
-
-  const hasSchedule = schedule.length > 0;
-
-  return (
-    <Layout onReset={handleReset} hasSchedule={hasSchedule}>
-      {!hasSchedule ? (
-        <UploadSchedule onScheduleGenerated={handleScheduleGenerated} />
-      ) : (
-        <div className="animate-fade-in">
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
-            <p className="text-gray-500">Track your progress and stay on top of your classes.</p>
-          </div>
-          
-          <AttendanceStats stats={stats} />
-          
-          <div className="mb-6 flex items-center justify-between">
-            <h3 className="text-xl font-bold text-gray-900">Weekly Sheet</h3>
-          </div>
-          
-          <ScheduleList 
-            schedule={schedule}
-            records={records}
-            onUpdateRecord={handleRecordUpdate}
-          />
-        </div>
-      )}
-    </Layout>
-  );
+                        <Route path="*" element={<Navigate to="/" replace />} />
+                    </Routes>
+                </Router>
+            </ThemeProvider>
+        </AuthProvider>
+    );
 };
 
 export default App;

@@ -1,0 +1,50 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@theme {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-primary: var(--primary);
+  --color-text: var(--text);
+  --color-border: var(--border);
+}
+
+:root {
+  /* Light Mode */
+  --background: #F5F5F7;
+  /* Apple-like light gray */
+  --surface: #FFFFFF;
+  /* White surface */
+  /* Zinc 100 */
+  --primary: #000000;
+  --text: #1C1C1E;
+  /* Slightly softer black */
+  /* Zinc 900 */
+  --border: #E5E5E5;
+  /* Subtle border */
+  /* Zinc 200 */
+}
+
+.dark {
+  /* Dark Mode */
+  --background: #000000;
+  --surface: #18181B;
+  /* Zinc 900 */
+  --primary: #FFFFFF;
+  --text: #FAFAFA;
+  /* Zinc 50 */
+  --border: rgba(255, 255, 255, 0.1);
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-family: 'Inter', sans-serif;
+  @apply transition-colors duration-300;
+}
+
+/* macOS-like scrollbar */
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}

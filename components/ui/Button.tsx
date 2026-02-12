@@ -1,30 +1,50 @@
 import React from 'react';
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary' | 'danger' | 'ghost' | 'outline';
+  size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
 }
 
-export const Button: React.FC<ButtonProps> = ({ 
-  children, 
-  variant = 'primary', 
-  className = '', 
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
+  children,
+  variant = 'primary',
+  size = 'md',
+  className,
   isLoading,
   disabled,
-  ...props 
-}) => {
-  const baseStyle = "inline-flex items-center justify-center px-4 py-2 border text-sm font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed";
-  
+  ...props
+}, ref) => {
+
   const variants = {
-    primary: "border-transparent text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500",
-    secondary: "border-gray-300 text-gray-700 bg-white hover:bg-gray-50 focus:ring-indigo-500",
-    danger: "border-transparent text-white bg-red-600 hover:bg-red-700 focus:ring-red-500",
-    ghost: "border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100",
+    primary: "bg-primary text-background hover:opacity-90 border-transparent shadow-none font-semibold",
+    secondary: "bg-surface text-text border-border hover:bg-black/5 dark:hover:bg-white/5",
+    outline: "bg-transparent border-border text-text hover:bg-black/5 dark:hover:bg-white/5",
+    danger: "bg-red-500/10 text-red-500 hover:bg-red-500/20 border-red-500/20",
+    ghost: "bg-transparent hover:bg-black/5 dark:hover:bg-white/5 text-zinc-500 hover:text-text border-transparent",
+  };
+
+  const sizes = {
+    sm: "px-3 py-1.5 text-xs rounded-lg",
+    md: "px-4 py-2 text-sm rounded-lg",
+    lg: "px-6 py-2.5 text-base rounded-lg",
   };
 
   return (
-    <button 
-      className={`${baseStyle} ${variants[variant]} ${className}`}
+    <button
+      ref={ref}
+      className={cn(
+        "inline-flex items-center justify-center transition-all duration-200 active:scale-[0.98] border focus:outline-none focus:ring-2 focus:ring-white/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100",
+        variants[variant],
+        sizes[size],
+        className
+      )}
       disabled={disabled || isLoading}
       {...props}
     >
@@ -37,4 +57,6 @@ export const Button: React.FC<ButtonProps> = ({
       {children}
     </button>
   );
-};
+});
+
+Button.displayName = 'Button';
