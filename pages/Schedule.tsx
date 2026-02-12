@@ -143,7 +143,7 @@ export const Schedule: React.FC = () => {
             {/* ==================== MOBILE VIEW ==================== */}
             <div className="md:hidden flex-1 flex flex-col overflow-hidden">
                 {/* Day Picker */}
-                <div className="flex gap-1 px-1 pb-3 overflow-x-auto scrollbar-hide shrink-0">
+                <div className="flex gap-1 px-1 pb-3 shrink-0">
                     {DAYS.map((day) => {
                         const isSelected = day === mobileSelectedDay;
                         const isToday = day === currentDayName;
@@ -152,14 +152,14 @@ export const Schedule: React.FC = () => {
                             <button
                                 key={day}
                                 onClick={() => setMobileSelectedDay(day)}
-                                className={`flex flex-col items-center min-w-[48px] py-2 px-2 rounded-xl transition-all shrink-0 ${isSelected
-                                    ? 'bg-primary text-background shadow-md'
+                                className={`flex flex-col items-center flex-1 py-2 rounded-xl transition-all ${isSelected
+                                    ? 'bg-primary text-background shadow-sm'
                                     : isToday
-                                        ? 'bg-primary/10 text-primary'
-                                        : 'text-zinc-500 active:bg-black/5 dark:active:bg-white/5'
+                                        ? 'bg-primary/10'
+                                        : 'active:bg-black/5 dark:active:bg-white/5'
                                     }`}
                             >
-                                <span className={`text-[10px] font-bold uppercase ${isSelected ? 'text-background/70' : ''}`}>
+                                <span className={`text-[10px] font-bold uppercase tracking-wide ${isSelected ? 'text-background/80' : 'text-zinc-400'}`}>
                                     {day.substring(0, 3)}
                                 </span>
                                 {classCount > 0 && (
@@ -186,22 +186,22 @@ export const Schedule: React.FC = () => {
                                 return (
                                     <motion.div
                                         key={item.id}
-                                        initial={{ opacity: 0, y: 10 }}
+                                        initial={{ opacity: 0, y: 6 }}
                                         animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: -10 }}
-                                        transition={{ delay: index * 0.05 }}
+                                        exit={{ opacity: 0, y: -6 }}
+                                        transition={{ delay: index * 0.03 }}
                                         onClick={(e) => handleEditClick(item, e)}
                                         className={`p-4 rounded-xl border-l-4 ${styles.bg} ${styles.border} active:scale-[0.98] transition-transform cursor-pointer`}
                                     >
-                                        <div className="font-bold text-base text-white drop-shadow-sm mb-1">{item.subject}</div>
-                                        <div className="flex items-center gap-3 text-xs font-medium text-white/80">
+                                        <div className="font-semibold text-[15px] text-text mb-1.5">{item.subject}</div>
+                                        <div className="flex items-center gap-3 text-xs text-zinc-400">
                                             <div className="flex items-center gap-1">
-                                                <Clock className="w-3.5 h-3.5" />
-                                                {item.startTime} - {item.endTime}
+                                                <Clock className="w-3 h-3" />
+                                                {item.startTime} – {item.endTime}
                                             </div>
                                             {item.room && (
                                                 <div className="flex items-center gap-1">
-                                                    <MapPin className="w-3.5 h-3.5" />
+                                                    <MapPin className="w-3 h-3" />
                                                     {item.room}
                                                 </div>
                                             )}
@@ -217,7 +217,7 @@ export const Schedule: React.FC = () => {
                 <motion.button
                     whileTap={{ scale: 0.9 }}
                     onClick={() => handleAddClick()}
-                    className="fixed bottom-24 right-5 w-14 h-14 rounded-full bg-primary text-background shadow-2xl shadow-primary/30 flex items-center justify-center z-40 active:scale-90"
+                    className="fixed bottom-20 right-4 w-14 h-14 rounded-full bg-primary text-background shadow-xl flex items-center justify-center z-40"
                 >
                     <Plus className="w-6 h-6" />
                 </motion.button>

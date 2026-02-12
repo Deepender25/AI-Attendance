@@ -264,19 +264,19 @@ export const UploadSchedule: React.FC<UploadScheduleProps> = ({ onScheduleGenera
   // ===================== UPLOAD VIEW =====================
   return (
     <GlassCard className="w-full max-w-xl mx-auto bg-surface border-border flex flex-col" noPadding>
-      <div className="p-8 pb-0 text-center">
-        <div className="mb-6 inline-flex p-4 rounded-full bg-black/5 dark:bg-white/5 text-text">
-          <Calendar className="w-8 h-8" />
+      <div className="p-4 md:p-8 pb-0 md:pb-0 text-center">
+        <div className="mb-4 md:mb-6 inline-flex p-3 md:p-4 rounded-full bg-black/5 dark:bg-white/5 text-text">
+          <Calendar className="w-6 h-6 md:w-8 md:h-8" />
         </div>
-        <h2 className="text-2xl font-bold text-text mb-2">
+        <h2 className="text-xl md:text-2xl font-bold text-text mb-1.5 md:mb-2">
           No Schedule Found
         </h2>
-        <p className="text-zinc-500 mb-8 max-w-sm mx-auto">
+        <p className="text-zinc-500 mb-5 md:mb-8 max-w-sm mx-auto text-sm md:text-base">
           Upload your timetable image to get started. We'll extract your classes automatically.
         </p>
       </div>
 
-      <div className="flex-1 flex flex-col min-h-0 px-8 pb-8 gap-4">
+      <div className="flex-1 flex flex-col min-h-0 px-4 md:px-8 pb-4 md:pb-8 gap-3 md:gap-4">
         <div className="flex-1 min-h-0 flex flex-col">
           <div
             className={`flex-1 relative border-2 border-dashed rounded-2xl p-4 transition-all duration-300 text-center group cursor-pointer overflow-hidden flex flex-col justify-center items-center ${isDragging

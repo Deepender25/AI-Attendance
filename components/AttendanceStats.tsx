@@ -32,24 +32,19 @@ export const AttendanceStats: React.FC<AttendanceStatsProps> = ({ stats }) => {
   return (
     <div className="flex flex-col gap-4 h-full">
       {/* Mobile: Horizontal stat strip */}
-      <div className="flex md:hidden gap-3 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
-        <GlassCard className="flex-none w-28 bg-surface border-border p-3 flex flex-col items-center justify-center">
-          <motion.span
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="text-3xl font-bold text-text"
-          >
-            {hasData ? Math.round(stats.percentage) : 0}
-          </motion.span>
-          <span className="text-lg text-zinc-500">%</span>
-          <span className="text-[10px] text-zinc-500 font-semibold mt-1">ATTENDANCE</span>
-        </GlassCard>
+      <div className="grid md:hidden grid-cols-4 gap-2">
+        <div className="bg-surface border border-border rounded-xl p-3 flex flex-col items-center justify-center">
+          <span className="text-2xl font-bold text-text">{hasData ? Math.round(stats.percentage) : 0}</span>
+          <span className="text-[10px] text-zinc-400 font-bold mt-0.5">PERCENT</span>
+        </div>
         {data.map((item) => (
-          <GlassCard key={item.name} className="flex-none w-24 bg-surface border-border p-3 flex flex-col items-center justify-center">
-            <div className="w-2.5 h-2.5 rounded-full mb-1" style={{ backgroundColor: item.color }} />
-            <span className="text-xl font-bold text-text">{item.value}</span>
-            <span className="text-[10px] text-zinc-500 font-semibold mt-0.5">{item.name.toUpperCase()}</span>
-          </GlassCard>
+          <div key={item.name} className="bg-surface border border-border rounded-xl p-3 flex flex-col items-center justify-center">
+            <span className="text-2xl font-bold text-text">{item.value}</span>
+            <div className="flex items-center gap-1 mt-0.5">
+              <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: item.color }} />
+              <span className="text-[10px] text-zinc-400 font-bold">{item.name.toUpperCase()}</span>
+            </div>
+          </div>
         ))}
       </div>
 

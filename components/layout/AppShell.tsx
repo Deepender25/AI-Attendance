@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {
     LayoutDashboard,
     Calendar,
@@ -9,7 +9,6 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
-import { useTheme } from '../../context/ThemeContext';
 import { TrafficLights } from '../ui/TrafficLights';
 import { ProfileModal } from '../ProfileModal';
 import { BottomNav } from './BottomNav';
@@ -38,7 +37,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
 
     return (
         <div className="h-screen w-screen bg-background text-text font-sans flex overflow-hidden transition-colors duration-300 relative">
-            {/* Desktop Restore Button (Visible when Sidebar is Hidden) */}
+            {/* Desktop Restore Button */}
             <AnimatePresence>
                 {!isSidebarVisible && (
                     <motion.button
@@ -126,15 +125,20 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
             />
 
             {/* Main Content Area */}
-            <main className={`flex-1 h-full w-full relative pt-2 px-3 pb-24 md:p-6 md:pb-6 bg-background overflow-hidden flex flex-col transition-[padding] duration-300 ${!isSidebarVisible ? 'md:pl-20' : ''}`}>
-                <div className="h-full w-full rounded-2xl overflow-hidden flex flex-col relative">
+            <main className={`flex-1 h-full w-full relative
+                pt-3 px-4 pb-20
+                md:p-6 md:pb-6
+                bg-background overflow-hidden flex flex-col transition-[padding] duration-300
+                ${!isSidebarVisible ? 'md:pl-20' : ''}`}
+            >
+                <div className="h-full w-full overflow-hidden flex flex-col relative">
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={location.pathname}
-                            initial={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}
-                            animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-                            exit={{ opacity: 0, scale: 1.02, filter: 'blur(10px)' }}
-                            transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -8 }}
+                            transition={{ duration: 0.2, ease: "easeOut" }}
                             className="h-full w-full flex flex-col"
                         >
                             {children}

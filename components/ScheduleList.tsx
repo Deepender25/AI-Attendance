@@ -1,9 +1,9 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { Calendar, ChevronLeft, ChevronRight, CheckCircle, XCircle, Clock, MapPin, X, MinusCircle } from 'lucide-react';
 import { ScheduleItem, AttendanceRecord, AttendanceStatus } from '../types';
 import { Button } from './ui/Button';
 import { GlassCard } from './ui/GlassCard';
-import { motion, AnimatePresence, useMotionValue, useTransform, PanInfo } from 'framer-motion';
+import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 
 interface ScheduleListProps {
   schedule: ScheduleItem[];
@@ -47,7 +47,6 @@ export const ScheduleList: React.FC<ScheduleListProps> = ({ schedule, records, o
     setSelectedDate(newDate);
   };
 
-  // Generate a week of dates for the horizontal picker
   const getWeekDates = () => {
     const dates: Date[] = [];
     const start = new Date(selectedDate);
@@ -73,11 +72,23 @@ export const ScheduleList: React.FC<ScheduleListProps> = ({ schedule, records, o
     }
   };
 
+  const getStatusBadge = (status?: AttendanceStatus) => {
+    switch (status) {
+      case AttendanceStatus.PRESENT:
+        return <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500 text-[10px] font-bold uppercase">Present</span>;
+      case AttendanceStatus.ABSENT:
+        return <span className="px-2 py-0.5 rounded-full bg-red-500/15 text-red-500 text-[10px] font-bold uppercase">Absent</span>;
+      case AttendanceStatus.CANCELLED:
+        return <span className="px-2 py-0.5 rounded-full bg-orange-400/15 text-orange-400 text-[10px] font-bold uppercase">Cancelled</span>;
+      default: return null;
+    }
+  };
+
   return (
     <GlassCard className="overflow-hidden bg-surface border-border h-full flex flex-col" noPadding>
       {/* Mobile: Horizontal Date Picker */}
       <div className="md:hidden border-b border-border shrink-0">
-        <div className="flex items-center gap-1 px-2 py-3 overflow-x-auto scrollbar-hide">
+        <div className="flex items-center px-3 py-2.5 gap-1.5 overflow-x-auto scrollbar-hide">
           {weekDates.map((date) => {
             const isSelected = date.toDateString() === selectedDate.toDateString();
             const isToday = date.toDateString() === today.toDateString();
@@ -86,17 +97,17 @@ export const ScheduleList: React.FC<ScheduleListProps> = ({ schedule, records, o
               <button
                 key={date.toISOString()}
                 onClick={() => setSelectedDate(new Date(date))}
-                className={`flex flex-col items-center min-w-[48px] py-2 px-2 rounded-xl transition-all ${isSelected
-                  ? 'bg-primary text-background shadow-md'
+                className={`flex flex-col items-center flex-1 min-w-[44px] py-2 rounded-xl transition-all ${isSelected
+                  ? 'bg-primary text-background shadow-sm'
                   : isToday
-                    ? 'bg-primary/10 text-primary'
-                    : 'text-zinc-500 active:bg-black/5 dark:active:bg-white/5'
+                    ? 'bg-primary/10'
+                    : 'active:bg-black/5 dark:active:bg-white/5'
                   }`}
               >
-                <span className={`text-[10px] font-bold uppercase ${isSelected ? 'text-background/70' : ''}`}>
+                <span className={`text-[10px] font-bold uppercase tracking-wide ${isSelected ? 'text-background/80' : 'text-zinc-400'}`}>
                   {dayShort}
                 </span>
-                <span className={`text-lg font-bold mt-0.5 ${isSelected ? 'text-background' : 'text-text'}`}>
+                <span className={`text-base font-bold leading-tight ${isSelected ? 'text-background' : 'text-text'}`}>
                   {date.getDate()}
                 </span>
               </button>
@@ -128,43 +139,45 @@ export const ScheduleList: React.FC<ScheduleListProps> = ({ schedule, records, o
       </div>
 
       {/* Class List */}
-      <div className="divide-y divide-border flex-1 overflow-y-auto custom-scrollbar">
+      <div className="flex-1 overflow-y-auto custom-scrollbar">
         {todaysClasses.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center text-zinc-500 p-6">
-            <div className="w-16 h-16 bg-black/5 dark:bg-white/5 rounded-full flex items-center justify-center mb-4">
-              <Calendar className="h-8 w-8 opacity-30" />
+          <div className="h-full flex flex-col items-center justify-center text-zinc-500 p-8">
+            <div className="w-14 h-14 bg-black/5 dark:bg-white/5 rounded-2xl flex items-center justify-center mb-3">
+              <Calendar className="h-6 w-6 opacity-30" />
             </div>
-            <p className="font-medium">No classes scheduled</p>
-            <p className="text-sm opacity-50">Enjoy your free time!</p>
+            <p className="font-semibold text-text text-sm">No classes today</p>
+            <p className="text-xs opacity-50 mt-1">Enjoy your free time!</p>
           </div>
         ) : (
-          <AnimatePresence mode='popLayout'>
-            {todaysClasses.map((item, index) => {
-              const record = getRecordForClass(item.id);
-              const status = record?.status;
+          <div className="divide-y divide-border/50">
+            <AnimatePresence mode='popLayout'>
+              {todaysClasses.map((item, index) => {
+                const record = getRecordForClass(item.id);
+                const status = record?.status;
 
-              return (
-                <SwipeableClassCard
-                  key={item.id}
-                  item={item}
-                  index={index}
-                  status={status}
-                  onStatusUpdate={handleStatusUpdate}
-                  onDeleteRecord={onDeleteRecord}
-                  selectedDate={selectedDate}
-                  statusColor={getStatusColor(status)}
-                />
-              );
-            })}
-          </AnimatePresence>
+                return (
+                  <MobileClassCard
+                    key={item.id}
+                    item={item}
+                    index={index}
+                    status={status}
+                    onStatusUpdate={handleStatusUpdate}
+                    onDeleteRecord={onDeleteRecord}
+                    selectedDate={selectedDate}
+                    statusColor={getStatusColor(status)}
+                    statusBadge={getStatusBadge(status)}
+                  />
+                );
+              })}
+            </AnimatePresence>
+          </div>
         )}
       </div>
     </GlassCard>
   );
 };
 
-// Swipeable card for mobile, regular card for desktop
-interface SwipeableCardProps {
+interface ClassCardProps {
   item: ScheduleItem;
   index: number;
   status?: AttendanceStatus;
@@ -172,17 +185,13 @@ interface SwipeableCardProps {
   onDeleteRecord?: (scheduleId: string, date: string) => void;
   selectedDate: Date;
   statusColor: string;
+  statusBadge: React.ReactNode;
 }
 
-const SwipeableClassCard: React.FC<SwipeableCardProps> = ({
-  item, index, status, onStatusUpdate, onDeleteRecord, selectedDate, statusColor
+const MobileClassCard: React.FC<ClassCardProps> = ({
+  item, index, status, onStatusUpdate, onDeleteRecord, selectedDate, statusColor, statusBadge
 }) => {
-  const x = useMotionValue(0);
-  const [swiping, setSwiping] = useState(false);
-
-  // Color indicators during swipe
-  const bgRight = useTransform(x, [0, 100], ['rgba(16,185,129,0)', 'rgba(16,185,129,0.15)']);
-  const bgLeft = useTransform(x, [-100, 0], ['rgba(239,68,68,0.15)', 'rgba(239,68,68,0)']);
+  const [swipeX, setSwipeX] = useState(0);
 
   const handleDragEnd = (_: any, info: PanInfo) => {
     const threshold = 80;
@@ -191,112 +200,106 @@ const SwipeableClassCard: React.FC<SwipeableCardProps> = ({
     } else if (info.offset.x < -threshold) {
       onStatusUpdate(item, AttendanceStatus.ABSENT);
     }
-    setSwiping(false);
+    setSwipeX(0);
   };
 
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, x: -10 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 10 }}
-      transition={{ type: "spring", stiffness: 120, damping: 20, delay: index * 0.05 }}
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -6 }}
+      transition={{ type: "spring", stiffness: 200, damping: 25, delay: index * 0.03 }}
       className="relative overflow-hidden"
     >
-      {/* Swipe background indicators (mobile only) */}
-      <motion.div
-        className="md:hidden absolute inset-0 flex items-center justify-between px-6 pointer-events-none"
-        style={{ background: swiping ? undefined : 'transparent' }}
-      >
-        <motion.div style={{ opacity: useTransform(x, [-100, -40], [1, 0]) }} className="flex items-center gap-2 text-red-500 font-semibold text-sm">
-          <XCircle className="w-5 h-5" /> Absent
-        </motion.div>
-        <motion.div style={{ opacity: useTransform(x, [40, 100], [0, 1]) }} className="flex items-center gap-2 text-emerald-500 font-semibold text-sm">
-          Present <CheckCircle className="w-5 h-5" />
-        </motion.div>
-      </motion.div>
+      {/* Swipe background hints (mobile only) */}
+      <div className="md:hidden absolute inset-0 flex items-center justify-between px-5 pointer-events-none">
+        <div className={`flex items-center gap-2 text-red-500 font-semibold text-xs transition-opacity ${swipeX < -30 ? 'opacity-100' : 'opacity-0'}`}>
+          <XCircle className="w-4 h-4" /> Absent
+        </div>
+        <div className={`flex items-center gap-2 text-emerald-500 font-semibold text-xs transition-opacity ${swipeX > 30 ? 'opacity-100' : 'opacity-0'}`}>
+          Present <CheckCircle className="w-4 h-4" />
+        </div>
+      </div>
 
       {/* Card content */}
       <motion.div
-        style={{ x }}
         drag="x"
         dragConstraints={{ left: 0, right: 0 }}
-        dragElastic={0.3}
-        onDragStart={() => setSwiping(true)}
+        dragElastic={0.25}
+        onDrag={(_, info) => setSwipeX(info.offset.x)}
         onDragEnd={handleDragEnd}
-        className={`relative bg-surface border-l-4 ${statusColor} p-4 md:p-5 flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4 group hover:bg-black/5 dark:hover:bg-white/5 transition-colors touch-pan-y`}
+        className={`relative bg-surface border-l-[3px] ${statusColor} px-4 py-3.5 md:p-5 flex flex-col md:flex-row md:items-center justify-between gap-2.5 md:gap-4 active:bg-black/[0.02] dark:active:bg-white/[0.02] transition-colors touch-pan-y`}
       >
-        <div className="flex-1 min-w-0 z-10">
-          <div className="flex flex-wrap items-center text-xs font-medium text-zinc-500 mb-1.5 gap-y-1">
-            <div className="flex items-center mr-4 px-2 py-0.5 rounded-md bg-black/5 dark:bg-white/5 text-zinc-400">
-              <Clock className="h-3 w-3 mr-1.5" />
-              {item.startTime} - {item.endTime}
-            </div>
+        {/* Info section */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <h4 className="text-[15px] md:text-lg font-semibold text-text truncate">{item.subject}</h4>
+            {/* Mobile: Status badge inline */}
+            <div className="md:hidden">{statusBadge}</div>
+          </div>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-zinc-400">
+            <span className="flex items-center gap-1">
+              <Clock className="h-3 w-3" />
+              {item.startTime} – {item.endTime}
+            </span>
             {item.room && (
-              <div className="flex items-center px-2 py-0.5">
-                <MapPin className="h-3 w-3 mr-1" />
+              <span className="flex items-center gap-1">
+                <MapPin className="h-3 w-3" />
                 {item.room}
-              </div>
+              </span>
             )}
           </div>
-          <h4 className="text-base md:text-lg font-semibold text-text truncate pr-2">{item.subject}</h4>
-
-          {/* Mobile: Swipe hint */}
-          {!status && (
-            <p className="md:hidden text-[10px] text-zinc-400 mt-1 font-medium">← Swipe to mark →</p>
-          )}
         </div>
 
-        {/* Status Buttons */}
-        <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 w-full md:w-auto z-10">
-          <div className="grid grid-cols-3 md:flex gap-2 flex-1 md:flex-none">
-            <Button
-              size="sm"
-              variant={status === AttendanceStatus.PRESENT ? 'primary' : 'secondary'}
+        {/* Action Buttons */}
+        <div className="flex items-center gap-1.5 w-full md:w-auto">
+          <div className="grid grid-cols-3 gap-1.5 flex-1 md:flex md:flex-none md:gap-2">
+            <button
               onClick={() => onStatusUpdate(item, AttendanceStatus.PRESENT)}
-              className="justify-center flex-1 md:flex-none min-h-[44px] md:min-h-0 min-w-[32px]"
-              title="Present"
+              className={`flex items-center justify-center gap-1.5 min-h-[40px] md:min-h-0 md:px-3 md:py-1.5 rounded-lg text-xs font-medium transition-all
+                ${status === AttendanceStatus.PRESENT
+                  ? 'bg-emerald-500 text-white shadow-sm'
+                  : 'bg-black/[0.04] dark:bg-white/[0.06] text-zinc-500 active:bg-emerald-500/20'
+                }`}
             >
-              <CheckCircle className={`h-4 w-4 md:mr-2 ${status === AttendanceStatus.PRESENT ? 'text-background' : 'text-zinc-500'}`} />
+              <CheckCircle className="h-4 w-4" />
               <span className="hidden md:inline">Present</span>
-            </Button>
+            </button>
 
-            <Button
-              size="sm"
-              variant={status === AttendanceStatus.ABSENT ? 'danger' : 'secondary'}
+            <button
               onClick={() => onStatusUpdate(item, AttendanceStatus.ABSENT)}
-              className="justify-center flex-1 md:flex-none min-h-[44px] md:min-h-0 min-w-[32px]"
-              title="Absent"
+              className={`flex items-center justify-center gap-1.5 min-h-[40px] md:min-h-0 md:px-3 md:py-1.5 rounded-lg text-xs font-medium transition-all
+                ${status === AttendanceStatus.ABSENT
+                  ? 'bg-red-500 text-white shadow-sm'
+                  : 'bg-black/[0.04] dark:bg-white/[0.06] text-zinc-500 active:bg-red-500/20'
+                }`}
             >
-              <XCircle className={`h-4 w-4 md:mr-2 ${status === AttendanceStatus.ABSENT ? 'text-red-500' : 'text-zinc-500'}`} />
+              <XCircle className="h-4 w-4" />
               <span className="hidden md:inline">Absent</span>
-            </Button>
+            </button>
 
-            <Button
-              size="sm"
-              variant={status === AttendanceStatus.CANCELLED ? 'outline' : 'secondary'}
+            <button
               onClick={() => onStatusUpdate(item, AttendanceStatus.CANCELLED)}
-              className={`justify-center flex-1 md:flex-none min-h-[44px] md:min-h-0 min-w-[32px] ${status === AttendanceStatus.CANCELLED ? 'bg-zinc-100 dark:bg-zinc-800' : ''}`}
-              title="Cancelled"
+              className={`flex items-center justify-center gap-1.5 min-h-[40px] md:min-h-0 md:px-3 md:py-1.5 rounded-lg text-xs font-medium transition-all
+                ${status === AttendanceStatus.CANCELLED
+                  ? 'bg-orange-400 text-white shadow-sm'
+                  : 'bg-black/[0.04] dark:bg-white/[0.06] text-zinc-500 active:bg-orange-500/20'
+                }`}
             >
-              <MinusCircle className={`h-4 w-4 md:mr-2 ${status === AttendanceStatus.CANCELLED ? 'text-orange-500' : 'text-zinc-500'}`} />
-              <span className="hidden md:inline">Cancelled</span>
-            </Button>
+              <MinusCircle className="h-4 w-4" />
+              <span className="hidden md:inline">Cancel</span>
+            </button>
           </div>
 
-          {/* Reset Button */}
+          {/* Reset */}
           {status && onDeleteRecord && (
-            <div className="flex justify-end mt-1 md:mt-0 md:ml-2">
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => onDeleteRecord(item.id, selectedDate.toISOString().split('T')[0])}
-                className="px-2 min-h-[44px] md:min-h-0 text-zinc-400 hover:text-red-500 hover:bg-red-500/10 transition-colors"
-                title="Reset / Clear Status"
-              >
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
+            <button
+              onClick={() => onDeleteRecord(item.id, selectedDate.toISOString().split('T')[0])}
+              className="p-2 min-h-[40px] min-w-[40px] flex items-center justify-center rounded-lg text-zinc-400 active:text-red-500 active:bg-red-500/10 transition-colors md:ml-1"
+            >
+              <X className="w-4 h-4" />
+            </button>
           )}
         </div>
       </motion.div>
