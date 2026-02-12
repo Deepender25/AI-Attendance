@@ -52,7 +52,7 @@ export const Register: React.FC = () => {
                         <User className="w-6 h-6" />
                     </div>
                     <h2 className="text-lg md:text-xl font-bold text-text">Create Account</h2>
-                    <p className="text-zinc-500 text-sm mt-1.5">Join AttendAI to track your classes.</p>
+                    <p className="text-zinc-500 text-sm mt-1.5">Join Attend Sight to track your classes.</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-5">
@@ -162,7 +162,7 @@ export const Register: React.FC = () => {
             </GlassCard>
 
             <div className="mt-8 text-zinc-600 text-xs">
-                © 2024 AttendAI. Secure System.
+                © 2024 Attend Sight. Secure System.
             </div>
         </div>
     );

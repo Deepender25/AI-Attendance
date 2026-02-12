@@ -16,8 +16,8 @@ export default defineConfig(({ mode }) => {
         registerType: 'autoUpdate',
         includeAssets: ['icons/apple-touch-icon-180x180.png'],
         manifest: {
-          name: 'AttendAI - Smart Attendance Tracker',
-          short_name: 'AttendAI',
+          name: 'Attend Sight - Smart Attendance Tracker',
+          short_name: 'Attend Sight',
           description: 'Track your class attendance smartly with AI-powered insights.',
           theme_color: '#000000',
           background_color: '#000000',
