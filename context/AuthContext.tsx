@@ -82,28 +82,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         fetchData();
     }, [fetchData]);
 
-    const saveData = async (newSchedule: ScheduleItem[], newRecords: AttendanceRecord[]) => {
+    const saveData = async (newSchedule?: ScheduleItem[], newRecords?: AttendanceRecord[]) => {
         if (!user) return;
         try {
+            const payload: any = {};
+            if (newSchedule !== undefined) payload.schedule = newSchedule;
+            if (newRecords !== undefined) payload.records = newRecords;
+
             await fetch(`${API_URL}/api/data/${user.id}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ schedule: newSchedule, records: newRecords }),
+                body: JSON.stringify(payload),
             });
         } catch (err) {
             console.error("Failed to save data", err);
-            // Optionally revert state here if strict consistency is needed
         }
     };
 
     const updateSchedule = async (newSchedule: ScheduleItem[]) => {
         setSchedule(newSchedule);
-        await saveData(newSchedule, records);
+        await saveData(newSchedule, undefined);
     };
 
     const updateRecords = async (newRecords: AttendanceRecord[]) => {
         setRecords(newRecords);
-        await saveData(schedule, newRecords);
+        await saveData(undefined, newRecords);
     };
 
     const login = async (email: string, password: string) => {
