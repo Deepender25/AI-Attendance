@@ -3,8 +3,6 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
     LayoutDashboard,
     Calendar,
-    Menu,
-    X,
     User,
     PanelLeftOpen,
     MoreHorizontal
@@ -14,21 +12,19 @@ import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { TrafficLights } from '../ui/TrafficLights';
 import { ProfileModal } from '../ProfileModal';
+import { BottomNav } from './BottomNav';
 
 interface AppShellProps {
     children: React.ReactNode;
 }
 
 export const AppShell: React.FC<AppShellProps> = ({ children }) => {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isSidebarVisible, setIsSidebarVisible] = useState(true);
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
     const location = useLocation();
-    const { user } = useAuth(); // Logout is now handling in ProfileModal
-
-    const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+    const { user } = useAuth();
 
     const handleWindowAction = (action: 'close' | 'minimize' | 'maximize') => {
         if (action === 'close') setIsSidebarVisible(false);
@@ -58,7 +54,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
                 )}
             </AnimatePresence>
 
-            {/* Sidebar (Desktop) */}
+            {/* Sidebar (Desktop Only) */}
             <AnimatePresence mode="wait">
                 {isSidebarVisible && (
                     <motion.aside
@@ -129,16 +125,8 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
                 onClose={() => setIsProfileModalOpen(false)}
             />
 
-            {/* Mobile Header */}
-            <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-background/80 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-4 z-50">
-                <span className="font-bold text-lg">AttendAI</span>
-                <button onClick={toggleSidebar} className="p-2 text-zinc-400 hover:text-white">
-                    {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
-                </button>
-            </div>
-
-            {/* Main Content Area - Full Screen Fit */}
-            <main className={`flex-1 h-full w-full relative p-4 md:p-6 bg-background overflow-hidden flex flex-col transition-[padding] duration-300 ${!isSidebarVisible ? 'md:pl-20' : ''}`}>
+            {/* Main Content Area */}
+            <main className={`flex-1 h-full w-full relative pt-2 px-3 pb-24 md:p-6 md:pb-6 bg-background overflow-hidden flex flex-col transition-[padding] duration-300 ${!isSidebarVisible ? 'md:pl-20' : ''}`}>
                 <div className="h-full w-full rounded-2xl overflow-hidden flex flex-col relative">
                     <AnimatePresence mode="wait">
                         <motion.div
@@ -155,56 +143,8 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
                 </div>
             </main>
 
-            {/* Mobile Drawer */}
-            <AnimatePresence>
-                {isSidebarOpen && (
-                    <>
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            onClick={toggleSidebar}
-                            className="md:hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-40"
-                        />
-                        <motion.div
-                            initial={{ x: '100%' }}
-                            animate={{ x: 0 }}
-                            exit={{ x: '100%' }}
-                            transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                            className="md:hidden fixed top-0 right-0 bottom-0 w-72 bg-surface shadow-2xl z-50 p-6 flex flex-col border-l border-border"
-                        >
-                            <div className="flex justify-between items-center mb-8">
-                                <span className="font-bold text-lg text-text">Menu</span>
-                                <button onClick={toggleSidebar} className="text-zinc-500 hover:text-text"><X size={20} /></button>
-                            </div>
-
-                            <nav className="space-y-2 flex-1">
-                                {navItems.map((item) => (
-                                    <Link
-                                        key={item.path}
-                                        to={item.path}
-                                        onClick={toggleSidebar}
-                                        className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-zinc-500 hover:text-text hover:bg-black/5 dark:hover:bg-white/5"
-                                    >
-                                        <item.icon className="w-5 h-5" />
-                                        {item.label}
-                                    </Link>
-                                ))}
-                            </nav>
-
-                            <div className="mt-auto pt-6 border-t border-border">
-                                <button
-                                    onClick={() => { toggleSidebar(); setIsProfileModalOpen(true); }}
-                                    className="flex items-center gap-3 px-4 py-3 w-full text-sm text-zinc-500 hover:text-text hover:bg-black/5 dark:hover:bg-white/5 rounded-lg"
-                                >
-                                    <User className="w-5 h-5" />
-                                    Profile & Settings
-                                </button>
-                            </div>
-                        </motion.div>
-                    </>
-                )}
-            </AnimatePresence>
-        </div >
+            {/* Mobile Bottom Navigation */}
+            <BottomNav onProfileClick={() => setIsProfileModalOpen(true)} />
+        </div>
     );
 };

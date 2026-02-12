@@ -4,14 +4,12 @@ import { ScheduleItem } from '../types';
 import { UpsertClassModal } from '../components/UpsertClassModal';
 import { GlassCard } from '../components/ui/GlassCard';
 import { Button } from '../components/ui/Button';
-import { Plus, ChevronLeft, ChevronRight, Clock, MapPin } from 'lucide-react';
+import { Plus, Clock, MapPin } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-const HOURS = Array.from({ length: 13 }, (_, i) => i + 8); // 8 AM to 8 PM
+const HOURS = Array.from({ length: 13 }, (_, i) => i + 8);
 
-// macOS Calendar consistent colors
-// macOS Calendar consistent colors
 const EVENT_COLORS = [
     { bg: 'bg-blue-500/20', border: 'border-blue-500/50', text: 'text-blue-100' },
     { bg: 'bg-purple-500/20', border: 'border-purple-500/50', text: 'text-purple-100' },
@@ -38,8 +36,10 @@ export const Schedule: React.FC = () => {
     const [selectedItem, setSelectedItem] = useState<ScheduleItem | undefined>(undefined);
     const [modalInitialState, setModalInitialState] = useState<Partial<ScheduleItem>>({});
     const [currentTime, setCurrentTime] = useState(new Date());
+    const [mobileSelectedDay, setMobileSelectedDay] = useState(
+        DAYS[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1]
+    );
 
-    // Update current time indicator
     useEffect(() => {
         const timer = setInterval(() => setCurrentTime(new Date()), 60000);
         return () => clearInterval(timer);
@@ -51,7 +51,7 @@ export const Schedule: React.FC = () => {
             const timeStr = `${hour > 12 ? hour - 12 : hour}:00 ${hour >= 12 ? 'PM' : 'AM'}`;
             setModalInitialState({ day, startTime: timeStr });
         } else {
-            setModalInitialState({});
+            setModalInitialState({ day: mobileSelectedDay });
         }
         setIsModalOpen(true);
     };
@@ -93,11 +93,11 @@ export const Schedule: React.FC = () => {
         const start = parse(startTime);
         const end = parse(endTime);
         const duration = end - start;
-        const startOffset = start - 8; // Start from 8 AM
+        const startOffset = start - 8;
 
         return {
-            top: `${startOffset * 64}px`, // 64px per hour height
-            height: `${Math.max(duration * 64, 32)}px`, // Minimum height for visibility
+            top: `${startOffset * 64}px`,
+            height: `${Math.max(duration * 64, 32)}px`,
         };
     };
 
@@ -106,35 +106,125 @@ export const Schedule: React.FC = () => {
         const hour = now.getHours();
         const minutes = now.getMinutes();
         const totalHours = hour + minutes / 60;
-
-        if (totalHours < 8 || totalHours > 21) return null; // Outside view
-
+        if (totalHours < 8 || totalHours > 21) return null;
         return (totalHours - 8) * 64;
     };
 
     const currentDayName = DAYS[new Date().getDay() - 1] || 'Sunday';
     const timePosition = getCurrentTimePosition();
 
+    // Mobile: classes for selected day
+    const mobileClasses = useMemo(() => {
+        return schedule
+            .filter(s => s.day === mobileSelectedDay)
+            .sort((a, b) => a.startTime.localeCompare(b.startTime));
+    }, [schedule, mobileSelectedDay]);
+
     return (
         <div className="h-full flex flex-col gap-4 overflow-hidden">
             {/* Toolbar Header */}
             <div className="flex items-center justify-between shrink-0 px-1 py-1">
                 <div>
-                    <h1 className="text-2xl font-bold text-text tracking-tight flex items-center gap-3">
+                    <h1 className="text-xl md:text-2xl font-bold text-text tracking-tight">
                         Schedule
                     </h1>
                 </div>
                 <div className="flex gap-2">
+                    {/* Desktop Add Button */}
                     <Button
                         onClick={() => handleAddClick()}
-                        className="bg-primary/90 hover:bg-primary shadow-lg shadow-primary/20 transition-all rounded-full px-5"
+                        className="hidden md:flex bg-primary/90 hover:bg-primary shadow-lg shadow-primary/20 transition-all rounded-full px-5"
                     >
                         <Plus className="w-4 h-4 mr-2" /> Add Class
                     </Button>
                 </div>
             </div>
 
-            <GlassCard className="flex-1 overflow-hidden flex flex-col relative bg-surface/50 backdrop-blur-xl border-border/50 shadow-2xl" noPadding>
+            {/* ==================== MOBILE VIEW ==================== */}
+            <div className="md:hidden flex-1 flex flex-col overflow-hidden">
+                {/* Day Picker */}
+                <div className="flex gap-1 px-1 pb-3 overflow-x-auto scrollbar-hide shrink-0">
+                    {DAYS.map((day) => {
+                        const isSelected = day === mobileSelectedDay;
+                        const isToday = day === currentDayName;
+                        const classCount = schedule.filter(s => s.day === day).length;
+                        return (
+                            <button
+                                key={day}
+                                onClick={() => setMobileSelectedDay(day)}
+                                className={`flex flex-col items-center min-w-[48px] py-2 px-2 rounded-xl transition-all shrink-0 ${isSelected
+                                    ? 'bg-primary text-background shadow-md'
+                                    : isToday
+                                        ? 'bg-primary/10 text-primary'
+                                        : 'text-zinc-500 active:bg-black/5 dark:active:bg-white/5'
+                                    }`}
+                            >
+                                <span className={`text-[10px] font-bold uppercase ${isSelected ? 'text-background/70' : ''}`}>
+                                    {day.substring(0, 3)}
+                                </span>
+                                {classCount > 0 && (
+                                    <span className={`text-[9px] font-bold mt-0.5 ${isSelected ? 'text-background/70' : 'text-zinc-400'}`}>
+                                        {classCount}
+                                    </span>
+                                )}
+                            </button>
+                        );
+                    })}
+                </div>
+
+                {/* Mobile Class List */}
+                <div className="flex-1 overflow-y-auto space-y-2 px-1">
+                    <AnimatePresence mode="popLayout">
+                        {mobileClasses.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center h-full text-zinc-500 pt-16">
+                                <p className="font-medium">No classes on {mobileSelectedDay}</p>
+                                <p className="text-sm opacity-50 mt-1">Tap + to add one</p>
+                            </div>
+                        ) : (
+                            mobileClasses.map((item, index) => {
+                                const styles = getSubjectColor(item.subject);
+                                return (
+                                    <motion.div
+                                        key={item.id}
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -10 }}
+                                        transition={{ delay: index * 0.05 }}
+                                        onClick={(e) => handleEditClick(item, e)}
+                                        className={`p-4 rounded-xl border-l-4 ${styles.bg} ${styles.border} active:scale-[0.98] transition-transform cursor-pointer`}
+                                    >
+                                        <div className="font-bold text-base text-white drop-shadow-sm mb-1">{item.subject}</div>
+                                        <div className="flex items-center gap-3 text-xs font-medium text-white/80">
+                                            <div className="flex items-center gap-1">
+                                                <Clock className="w-3.5 h-3.5" />
+                                                {item.startTime} - {item.endTime}
+                                            </div>
+                                            {item.room && (
+                                                <div className="flex items-center gap-1">
+                                                    <MapPin className="w-3.5 h-3.5" />
+                                                    {item.room}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </motion.div>
+                                );
+                            })
+                        )}
+                    </AnimatePresence>
+                </div>
+
+                {/* Mobile FAB */}
+                <motion.button
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => handleAddClick()}
+                    className="fixed bottom-24 right-5 w-14 h-14 rounded-full bg-primary text-background shadow-2xl shadow-primary/30 flex items-center justify-center z-40 active:scale-90"
+                >
+                    <Plus className="w-6 h-6" />
+                </motion.button>
+            </div>
+
+            {/* ==================== DESKTOP VIEW ==================== */}
+            <GlassCard className="hidden md:flex flex-1 overflow-hidden flex-col relative bg-surface/50 backdrop-blur-xl border-border/50 shadow-2xl" noPadding>
                 {/* Calendar Header */}
                 <div className="grid grid-cols-[60px_1fr] border-b border-white/5 bg-white/5 dark:bg-black/5 backdrop-blur-md shrink-0 z-20">
                     <div className="p-3 border-r border-white/5 flex items-end justify-center pb-2">
@@ -181,7 +271,7 @@ export const Schedule: React.FC = () => {
                                 ))}
                             </div>
 
-                            {/* Current Time Indicator Line */}
+                            {/* Current Time Indicator */}
                             {timePosition !== null && (
                                 <div
                                     className="absolute w-full z-10 pointer-events-none flex items-center"
@@ -194,7 +284,6 @@ export const Schedule: React.FC = () => {
 
                             {DAYS.map(day => (
                                 <div key={day} className="relative h-full group">
-                                    {/* Interaction Layers */}
                                     {HOURS.map(h => (
                                         <div
                                             key={h}
@@ -204,7 +293,6 @@ export const Schedule: React.FC = () => {
                                         />
                                     ))}
 
-                                    {/* Events */}
                                     <AnimatePresence>
                                         {schedule
                                             .filter(s => s.day === day)

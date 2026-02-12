@@ -1,44 +1,66 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Calendar, User } from 'lucide-react';
+import { LayoutDashboard, Calendar, Settings, User } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-export const BottomNav: React.FC = () => {
+interface BottomNavProps {
+    onProfileClick: () => void;
+}
+
+export const BottomNav: React.FC<BottomNavProps> = ({ onProfileClick }) => {
     const location = useLocation();
 
     const navItems = [
         { icon: LayoutDashboard, label: 'Home', path: '/' },
         { icon: Calendar, label: 'Schedule', path: '/schedule' },
-        { icon: User, label: 'Profile', path: '/settings' }, // Assuming settings/profile route
+        { icon: Settings, label: 'Settings', path: '/settings' },
     ];
 
     return (
-        <div className="md:hidden fixed bottom-0 left-0 right-0 h-[64px] bg-surface border-t border-border z-50 flex items-center justify-around px-2 shadow-lg safe-area-bottom">
-            {navItems.map((item) => {
-                const isActive = location.pathname === item.path;
-                return (
-                    <Link
-                        key={item.path}
-                        to={item.path}
-                        className="relative flex flex-col items-center justify-center w-full h-full group"
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 safe-area-bottom">
+            <div className="mx-3 mb-3 rounded-2xl bg-surface/90 backdrop-blur-xl border border-border/50 shadow-2xl shadow-black/20">
+                <div className="flex items-center justify-around px-1 py-1">
+                    {navItems.map((item) => {
+                        const isActive = location.pathname === item.path;
+                        return (
+                            <Link
+                                key={item.path}
+                                to={item.path}
+                                className="relative flex flex-col items-center justify-center min-w-[60px] min-h-[56px] rounded-xl transition-colors active:scale-95"
+                            >
+                                {isActive && (
+                                    <motion.div
+                                        layoutId="mobileNavBg"
+                                        className="absolute inset-1 bg-primary/10 dark:bg-primary/15 rounded-xl"
+                                        initial={false}
+                                        transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                                    />
+                                )}
+                                <item.icon
+                                    className={`w-5 h-5 z-10 transition-colors duration-200 ${isActive ? 'text-primary' : 'text-zinc-400'}`}
+                                    strokeWidth={isActive ? 2.5 : 2}
+                                />
+                                <span className={`text-[10px] font-semibold mt-0.5 z-10 transition-colors duration-200 ${isActive ? 'text-primary' : 'text-zinc-500'}`}>
+                                    {item.label}
+                                </span>
+                            </Link>
+                        );
+                    })}
+
+                    {/* Profile Button */}
+                    <button
+                        onClick={onProfileClick}
+                        className="relative flex flex-col items-center justify-center min-w-[60px] min-h-[56px] rounded-xl active:scale-95 transition-transform"
                     >
-                        {isActive && (
-                            <motion.div
-                                layoutId="bottomNavIndicator"
-                                className="absolute top-0 w-12 h-1 bg-primary rounded-b-full"
-                                initial={false}
-                                transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                            />
-                        )}
-                        <item.icon
-                            className={`w-6 h-6 z-10 transition-colors duration-200 ${isActive ? 'text-primary' : 'text-zinc-400'}`}
-                        />
-                        <span className={`text-[10px] font-medium mt-1 z-10 transition-colors duration-200 ${isActive ? 'text-text' : 'text-zinc-500'}`}>
-                            {item.label}
+                        <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center z-10">
+                            <User className="w-3.5 h-3.5 text-background" />
+                        </div>
+                        <span className="text-[10px] font-semibold mt-0.5 z-10 text-zinc-500">
+                            Profile
                         </span>
-                    </Link>
-                );
-            })}
+                    </button>
+                </div>
+            </div>
         </div>
     );
 };

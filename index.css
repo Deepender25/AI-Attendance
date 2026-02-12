@@ -48,3 +48,23 @@ body {
   width: 0px;
   background: transparent;
 }
+
+/* Safe area for bottom nav (iPhone notch/home indicator) */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Hide scrollbar but keep scroll functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Touch gesture support */
+.touch-pan-y {
+  touch-action: pan-y;
+}

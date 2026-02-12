@@ -15,9 +15,9 @@ export const AttendanceStats: React.FC<AttendanceStatsProps> = ({ stats }) => {
   const isDark = theme === 'dark';
 
   const data = [
-    { name: 'Present', value: stats.attendedClasses, color: '#10B981' }, // Emerald 500
-    { name: 'Absent', value: stats.missedClasses, color: '#EF4444' },    // Red 500
-    { name: 'Cancelled', value: stats.cancelledClasses, color: '#F97316' } // Orange 500
+    { name: 'Present', value: stats.attendedClasses, color: '#10B981' },
+    { name: 'Absent', value: stats.missedClasses, color: '#EF4444' },
+    { name: 'Cancelled', value: stats.cancelledClasses, color: '#F97316' }
   ];
 
   const hasData = stats.totalClasses > 0 || stats.cancelledClasses > 0;
@@ -31,8 +31,30 @@ export const AttendanceStats: React.FC<AttendanceStatsProps> = ({ stats }) => {
 
   return (
     <div className="flex flex-col gap-4 h-full">
-      {/* Percentage Card */}
-      <GlassCard className="relative overflow-hidden flex-none md:flex-1 flex flex-col justify-center bg-surface border-border min-h-[140px]">
+      {/* Mobile: Horizontal stat strip */}
+      <div className="flex md:hidden gap-3 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
+        <GlassCard className="flex-none w-28 bg-surface border-border p-3 flex flex-col items-center justify-center">
+          <motion.span
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="text-3xl font-bold text-text"
+          >
+            {hasData ? Math.round(stats.percentage) : 0}
+          </motion.span>
+          <span className="text-lg text-zinc-500">%</span>
+          <span className="text-[10px] text-zinc-500 font-semibold mt-1">ATTENDANCE</span>
+        </GlassCard>
+        {data.map((item) => (
+          <GlassCard key={item.name} className="flex-none w-24 bg-surface border-border p-3 flex flex-col items-center justify-center">
+            <div className="w-2.5 h-2.5 rounded-full mb-1" style={{ backgroundColor: item.color }} />
+            <span className="text-xl font-bold text-text">{item.value}</span>
+            <span className="text-[10px] text-zinc-500 font-semibold mt-0.5">{item.name.toUpperCase()}</span>
+          </GlassCard>
+        ))}
+      </div>
+
+      {/* Desktop: Full percentage card */}
+      <GlassCard className="hidden md:flex relative overflow-hidden flex-none md:flex-1 flex-col justify-center bg-surface border-border min-h-[140px]">
         <h3 className="text-zinc-500 font-medium uppercase tracking-wide text-xs mb-2 text-center">Overall Attendance</h3>
 
         <div className="flex items-baseline justify-center">
@@ -59,8 +81,8 @@ export const AttendanceStats: React.FC<AttendanceStatsProps> = ({ stats }) => {
         </motion.p>
       </GlassCard>
 
-      {/* Chart Card */}
-      <GlassCard className="flex-1 flex flex-col bg-surface border-border min-h-[280px]">
+      {/* Desktop: Chart Card */}
+      <GlassCard className="hidden md:flex flex-1 flex-col bg-surface border-border min-h-[280px]">
         <h3 className="text-zinc-500 font-medium uppercase tracking-wide text-xs mb-4 text-center">Attendance Breakdown</h3>
         <div className="flex-1 w-full min-h-0">
           {hasData ? (

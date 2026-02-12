@@ -118,12 +118,29 @@ export const Settings = () => {
     ];
 
     return (
-        <div className="h-full flex flex-col p-4 md:p-8 max-w-6xl mx-auto w-full gap-8">
-            <h1 className="text-3xl font-bold text-text tracking-tight shrink-0">Account Settings</h1>
+        <div className="h-full flex flex-col px-1 pt-1 md:p-8 max-w-6xl mx-auto w-full gap-4 md:gap-8 overflow-hidden">
+            <h1 className="text-xl md:text-3xl font-bold text-text tracking-tight shrink-0 px-1">Account Settings</h1>
 
-            <div className="flex flex-col md:flex-row gap-8 flex-1 min-h-0">
-                {/* Sidebar Navigation */}
-                <div className="w-full md:w-64 flex flex-col gap-2 shrink-0">
+            <div className="flex flex-col md:flex-row gap-4 md:gap-8 flex-1 min-h-0">
+                {/* Mobile: Horizontal Pill Tabs */}
+                <div className="md:hidden flex gap-2 overflow-x-auto scrollbar-hide px-1 pb-1 shrink-0">
+                    {tabs.map(tab => (
+                        <button
+                            key={tab.id}
+                            onClick={() => { setActiveTab(tab.id as SettingsTab); setFeedback(null); }}
+                            className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all shrink-0 ${activeTab === tab.id
+                                ? 'bg-primary text-background shadow-md'
+                                : 'bg-black/5 dark:bg-white/5 text-zinc-500 active:bg-black/10 dark:active:bg-white/10'
+                                }`}
+                        >
+                            <tab.icon className="w-4 h-4" />
+                            {tab.label}
+                        </button>
+                    ))}
+                </div>
+
+                {/* Desktop: Sidebar Navigation */}
+                <div className="hidden md:flex w-64 flex-col gap-2 shrink-0">
                     {tabs.map(tab => (
                         <button
                             key={tab.id}
@@ -151,7 +168,7 @@ export const Settings = () => {
                 </div>
 
                 {/* Content Area */}
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 min-h-0 overflow-y-auto">
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={activeTab}
@@ -161,7 +178,7 @@ export const Settings = () => {
                             transition={{ duration: 0.2 }}
                             className="h-full"
                         >
-                            <GlassCard className="h-fit min-h-[400px] relative overflow-hidden ring-1 ring-white/10 shadow-2xl">
+                            <GlassCard className="h-fit min-h-[300px] md:min-h-[400px] relative overflow-hidden ring-1 ring-white/10 shadow-2xl">
                                 {/* Feedback Toast */}
                                 {feedback && (
                                     <motion.div
