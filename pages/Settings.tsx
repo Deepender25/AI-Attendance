@@ -178,7 +178,7 @@ export const Settings = () => {
                             transition={{ duration: 0.2 }}
                             className="h-full"
                         >
-                            <GlassCard className="h-fit min-h-[300px] md:min-h-[400px] relative overflow-hidden ring-1 ring-white/10 shadow-2xl">
+                            <GlassCard className="h-fit relative overflow-hidden">
                                 {/* Feedback Toast */}
                                 {feedback && (
                                     <motion.div
@@ -195,20 +195,20 @@ export const Settings = () => {
                                     </motion.div>
                                 )}
 
-                                <div className="p-8 md:p-10 max-w-lg mx-auto">
+                                <div className="p-5 md:p-10 max-w-lg mx-auto">
                                     {activeTab === 'general' && (
                                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                             <div className="flex flex-col items-center gap-4">
                                                 <div className="relative group cursor-pointer">
-                                                    <div className="w-28 h-28 rounded-full bg-surface border-4 border-surface shadow-2xl flex items-center justify-center text-primary overflow-hidden">
-                                                        <User className="w-12 h-12" />
+                                                    <div className="w-20 h-20 md:w-28 md:h-28 rounded-full bg-surface border-4 border-surface shadow-2xl flex items-center justify-center text-primary overflow-hidden">
+                                                        <User className="w-10 h-10 md:w-12 md:h-12" />
                                                     </div>
                                                     <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        <Camera className="w-8 h-8 text-white" />
+                                                        <Camera className="w-6 h-6 md:w-8 md:h-8 text-white" />
                                                     </div>
                                                 </div>
                                                 <div className="text-center">
-                                                    <h2 className="text-2xl font-bold text-text">{user?.name}</h2>
+                                                    <h2 className="text-lg md:text-2xl font-bold text-text">{user?.name}</h2>
                                                     <p className="text-zinc-500 mt-1">{user?.email}</p>
                                                     <span className="inline-block mt-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium border border-primary/20">
                                                         {user?.role || 'Student'}
@@ -223,13 +223,14 @@ export const Settings = () => {
                                                         type="text"
                                                         value={name}
                                                         onChange={(e) => setName(e.target.value)}
-                                                        className="w-full bg-black/5 dark:bg-white/5 border border-white/10 rounded-xl px-4 py-3 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:bg-black/10 transition-all font-medium"
+                                                        className="w-full bg-black/5 dark:bg-white/5 border border-border rounded-xl px-4 py-3 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-medium text-text"
                                                         placeholder="Enter your name"
                                                     />
                                                 </div>
 
                                                 <Button
-                                                    className="w-full py-6 text-base shadow-lg shadow-primary/20"
+                                                    className="w-full"
+                                                    size="lg"
                                                     onClick={handleUpdateName}
                                                     disabled={isLoading || name === user?.name}
                                                 >
@@ -255,7 +256,7 @@ export const Settings = () => {
                                                             type="password"
                                                             value={passwords.current}
                                                             onChange={(e) => setPasswords({ ...passwords, current: e.target.value })}
-                                                            className="w-full bg-black/5 dark:bg-white/5 border border-white/10 rounded-xl pl-11 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:bg-black/10 transition-all"
+                                                            className="w-full bg-black/5 dark:bg-white/5 border border-border rounded-xl pl-11 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-text"
                                                             placeholder="••••••••"
                                                         />
                                                     </div>
@@ -268,7 +269,7 @@ export const Settings = () => {
                                                             type="password"
                                                             value={passwords.new}
                                                             onChange={(e) => setPasswords({ ...passwords, new: e.target.value })}
-                                                            className="w-full bg-black/5 dark:bg-white/5 border border-white/10 rounded-xl pl-11 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:bg-black/10 transition-all"
+                                                            className="w-full bg-black/5 dark:bg-white/5 border border-border rounded-xl pl-11 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-text"
                                                             placeholder="••••••••"
                                                         />
                                                     </div>
@@ -281,7 +282,7 @@ export const Settings = () => {
                                                             type="password"
                                                             value={passwords.confirm}
                                                             onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })}
-                                                            className="w-full bg-black/5 dark:bg-white/5 border border-white/10 rounded-xl pl-11 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:bg-black/10 transition-all"
+                                                            className="w-full bg-black/5 dark:bg-white/5 border border-border rounded-xl pl-11 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-text"
                                                             placeholder="••••••••"
                                                         />
                                                     </div>
@@ -289,7 +290,8 @@ export const Settings = () => {
                                             </div>
 
                                             <Button
-                                                className="w-full py-6 shadow-lg shadow-primary/20"
+                                                className="w-full"
+                                                size="lg"
                                                 onClick={handleUpdatePassword}
                                                 disabled={isLoading}
                                             >
@@ -325,13 +327,14 @@ export const Settings = () => {
                                                                 type="email"
                                                                 value={emailState.newEmail}
                                                                 onChange={(e) => setEmailState({ ...emailState, newEmail: e.target.value })}
-                                                                className="w-full bg-black/5 dark:bg-white/5 border border-white/10 rounded-xl pl-11 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:bg-black/10 transition-all"
+                                                                className="w-full bg-black/5 dark:bg-white/5 border border-border rounded-xl pl-11 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-text"
                                                                 placeholder="name@example.com"
                                                             />
                                                         </div>
                                                     </div>
                                                     <Button
-                                                        className="w-full py-6 shadow-lg shadow-primary/20"
+                                                        className="w-full"
+                                                        size="lg"
                                                         onClick={handleRequestEmailUpdate}
                                                         disabled={isLoading}
                                                     >
@@ -356,7 +359,7 @@ export const Settings = () => {
                                                             type="text"
                                                             value={emailState.otp}
                                                             onChange={(e) => setEmailState({ ...emailState, otp: e.target.value })}
-                                                            className="w-full bg-black/5 dark:bg-white/10 border border-white/10 rounded-xl px-4 py-4 text-center text-3xl tracking-[0.5em] font-mono focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                                                            className="w-full bg-black/5 dark:bg-white/10 border border-border rounded-xl px-4 py-4 text-center text-2xl md:text-3xl tracking-[0.5em] font-mono focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-text"
                                                             placeholder="••••••"
                                                             maxLength={6}
                                                             autoFocus
@@ -368,14 +371,14 @@ export const Settings = () => {
                                                             variant="secondary"
                                                             onClick={() => setEmailState({ ...emailState, step: 'input' })}
                                                             disabled={isLoading}
-                                                            className="flex-1 py-4"
+                                                            className="flex-1"
                                                         >
                                                             Back
                                                         </Button>
                                                         <Button
                                                             onClick={handleVerifyEmailUpdate}
                                                             disabled={isLoading}
-                                                            className="flex-[2] py-4 shadow-lg shadow-primary/20"
+                                                            className="flex-[2]"
                                                         >
                                                             {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Verify & Update'}
                                                         </Button>

@@ -69,8 +69,8 @@ export const Dashboard: React.FC = () => {
 
     if (isDataLoading && schedule.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] text-white">
-                <RefreshCw className="w-8 h-8 animate-spin mb-4" />
+            <div className="flex flex-col items-center justify-center min-h-[60vh]">
+                <RefreshCw className="w-8 h-8 animate-spin mb-4 text-zinc-400" />
                 <p className="font-medium animate-pulse text-zinc-400">Syncing your data...</p>
             </div>
         );
@@ -83,10 +83,10 @@ export const Dashboard: React.FC = () => {
             {/* Header Content */}
             <div className="flex items-center justify-between gap-4 shrink-0 px-1">
                 <div>
-                    <h1 className="text-2xl md:text-3xl font-bold text-text tracking-tight">
+                    <h1 className="text-xl md:text-3xl font-bold text-text tracking-tight">
                         Overview
                     </h1>
-                    <p className="text-zinc-500 mt-0.5 text-sm md:text-base">
+                    <p className="text-zinc-500 mt-0.5 text-xs md:text-base">
                         Hey, {user?.name.split(' ')[0]} 👋
                     </p>
                 </div>
@@ -117,21 +117,17 @@ export const Dashboard: React.FC = () => {
                 </div>
             ) : (
                 /* Mobile: single vertical scroll column. Desktop: 3-col grid */
-                <div className="flex-1 min-h-0 flex flex-col lg:grid lg:grid-cols-3 gap-4 md:gap-6 overflow-y-auto lg:overflow-hidden pb-2 md:pb-0">
+                <div className="flex-1 min-h-0 flex flex-col lg:grid lg:grid-cols-3 gap-3 md:gap-6 overflow-y-auto lg:overflow-hidden pb-2 md:pb-0">
                     {/* Stats Section */}
-                    <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="lg:col-span-1 lg:h-full lg:overflow-y-auto pr-0 lg:pr-2 custom-scrollbar flex flex-col gap-4 shrink-0"
+                    <div
+                        className="lg:col-span-1 lg:h-full lg:overflow-y-auto pr-0 lg:pr-2 custom-scrollbar flex flex-col gap-3 md:gap-4 shrink-0"
                     >
                         <AttendanceStats stats={stats} />
-                    </motion.div>
+                    </div>
 
                     {/* Weekly Schedule */}
-                    <motion.div
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="lg:col-span-2 lg:h-full flex flex-col overflow-hidden min-h-[300px]"
+                    <div
+                        className="lg:col-span-2 lg:h-full flex flex-col overflow-hidden"
                     >
                         <div className="flex-1 lg:overflow-y-auto lg:pr-2 custom-scrollbar h-full">
                             <ScheduleList
@@ -141,7 +137,7 @@ export const Dashboard: React.FC = () => {
                                 onDeleteRecord={handleRecordDelete}
                             />
                         </div>
-                    </motion.div>
+                    </div>
                 </div>
             )}
         </div>

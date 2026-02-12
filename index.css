@@ -40,10 +40,37 @@ body {
   background-color: var(--color-background);
   color: var(--color-text);
   font-family: 'Inter', sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   @apply transition-colors duration-300;
 }
 
-/* macOS-like scrollbar */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Desktop-only thin scrollbar */
+@media (min-width: 768px) {
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(128, 128, 128, 0.3);
+    border-radius: 3px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(128, 128, 128, 0.5);
+  }
+}
+
+/* Hidden scrollbar everywhere else */
 ::-webkit-scrollbar {
   width: 0px;
   background: transparent;

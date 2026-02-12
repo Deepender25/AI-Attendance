@@ -1,13 +1,12 @@
 import React from 'react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { motion, HTMLMotionProps } from 'framer-motion';
 
 function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
-interface CardProps extends HTMLMotionProps<"div"> {
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
     children: React.ReactNode;
     className?: string;
     variant?: 'default' | 'hover' | 'interactive';
@@ -21,7 +20,6 @@ export const GlassCard: React.FC<CardProps> = ({
     noPadding = false,
     ...props
 }) => {
-    // Bold Black Minimalist Styles
     const variants = {
         default: "bg-surface border-border",
         hover: "bg-surface border-border hover:border-zinc-400 dark:hover:border-zinc-700 transition-colors duration-200",
@@ -29,12 +27,9 @@ export const GlassCard: React.FC<CardProps> = ({
     };
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
+        <div
             className={cn(
-                "border rounded-xl overflow-hidden", // Removed backdrop-blur and shadow-xl for minimalist look
+                "border rounded-xl overflow-hidden",
                 variants[variant],
                 noPadding ? "" : "p-6",
                 className
@@ -42,6 +37,6 @@ export const GlassCard: React.FC<CardProps> = ({
             {...props}
         >
             {children}
-        </motion.div>
+        </div>
     );
 };

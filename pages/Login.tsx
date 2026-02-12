@@ -32,15 +32,15 @@ export const Login: React.FC = () => {
             {/* Minimalist Background - No Blobs */}
 
             <GlassCard className="w-full max-w-md relative z-10 border-border bg-surface" noPadding>
-                <div className="p-8 text-center border-b border-border">
-                    <div className="w-12 h-12 bg-primary text-background rounded-lg mx-auto flex items-center justify-center shadow-none mb-6">
+                <div className="p-6 md:p-8 text-center border-b border-border">
+                    <div className="w-12 h-12 bg-primary text-background rounded-xl mx-auto flex items-center justify-center shadow-none mb-4 md:mb-6">
                         <Lock className="w-6 h-6" />
                     </div>
-                    <h2 className="text-xl font-bold text-text">Welcome Back</h2>
-                    <p className="text-zinc-500 text-sm mt-2">Sign in to access your attendance.</p>
+                    <h2 className="text-lg md:text-xl font-bold text-text">Welcome Back</h2>
+                    <p className="text-zinc-500 text-sm mt-1.5">Sign in to access your attendance.</p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-8 space-y-5">
+                <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-5">
                     {error && (
                         <div className="p-3 bg-red-500/10 text-red-500 text-sm rounded-lg border border-red-500/20">
                             {error}
@@ -56,7 +56,7 @@ export const Login: React.FC = () => {
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2.5 bg-zinc-50 dark:bg-black/20 border border-border rounded-lg focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none text-text placeholder-zinc-500"
+                                    className="w-full pl-10 pr-4 py-3 bg-black/5 dark:bg-white/5 border border-border rounded-xl focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none text-text placeholder-zinc-400"
                                     placeholder="name@example.com"
                                     required
                                 />
@@ -71,7 +71,7 @@ export const Login: React.FC = () => {
                                     type="password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2.5 bg-zinc-50 dark:bg-black/20 border border-border rounded-lg focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none text-text placeholder-zinc-500"
+                                    className="w-full pl-10 pr-4 py-3 bg-black/5 dark:bg-white/5 border border-border rounded-xl focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none text-text placeholder-zinc-400"
                                     placeholder="••••••••"
                                     required
                                 />
@@ -82,7 +82,7 @@ export const Login: React.FC = () => {
                     <Button
                         type="submit"
                         isLoading={isLoading}
-                        className="w-full py-2.5 bg-primary text-background hover:opacity-90 font-medium shadow-none rounded-lg"
+                        className="w-full"
                         size="lg"
                     >
                         Sign In <ArrowRight className="ml-2 h-4 w-4" />

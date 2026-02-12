@@ -214,11 +214,11 @@ const MobileClassCard: React.FC<ClassCardProps> = ({
     >
       {/* Swipe background hints (mobile only) */}
       <div className="md:hidden absolute inset-0 flex items-center justify-between px-5 pointer-events-none">
-        <div className={`flex items-center gap-2 text-red-500 font-semibold text-xs transition-opacity ${swipeX < -30 ? 'opacity-100' : 'opacity-0'}`}>
-          <XCircle className="w-4 h-4" /> Absent
-        </div>
         <div className={`flex items-center gap-2 text-emerald-500 font-semibold text-xs transition-opacity ${swipeX > 30 ? 'opacity-100' : 'opacity-0'}`}>
-          Present <CheckCircle className="w-4 h-4" />
+          <CheckCircle className="w-4 h-4" /> Present
+        </div>
+        <div className={`flex items-center gap-2 text-red-500 font-semibold text-xs transition-opacity ${swipeX < -30 ? 'opacity-100' : 'opacity-0'}`}>
+          Absent <XCircle className="w-4 h-4" />
         </div>
       </div>
 
