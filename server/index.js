@@ -49,7 +49,13 @@ app.get('/health', (req, res) => {
 app.use('/auth', authRoutes);
 app.use('/api/data', dataRoutes);
 
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-    console.log(`Owner: ${process.env.GITHUB_OWNER}`);
-});
+// Export the app for Vercel serverless function
+export default app;
+
+// Only listen if running locally
+if (process.env.NODE_ENV !== 'production' && process.argv[1] === fileURLToPath(import.meta.url)) {
+    app.listen(PORT, () => {
+        console.log(`Server running on http://localhost:${PORT}`);
+        console.log(`Owner: ${process.env.GITHUB_OWNER}`);
+    });
+}
