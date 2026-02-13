@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Lock, Mail, ArrowRight } from 'lucide-react';
 import { GlassCard } from '../components/ui/GlassCard';
 import { Button } from '../components/ui/Button';
+import { motion } from 'framer-motion';
 
 export const Login: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -29,12 +30,31 @@ export const Login: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-background text-text flex flex-col items-center justify-center p-4 relative overflow-hidden transition-colors duration-300">
-            {/* Minimalist Background - No Blobs */}
+            {/* Subtle Animated Background */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <motion.div
+                    className="absolute -top-[50%] -left-[50%] w-[200%] h-[200%] bg-[radial-gradient(circle_at_center,_var(--color-primary)_0%,_transparent_25%)] opacity-5 dark:opacity-10"
+                    animate={{
+                        transform: [
+                            'translate(0%, 0%) scale(1)',
+                            'translate(-5%, 5%) scale(1.1)',
+                            'translate(5%, -5%) scale(0.9)',
+                            'translate(0%, 0%) scale(1)',
+                        ],
+                    }}
+                    transition={{
+                        duration: 20,
+                        repeat: Infinity,
+                        repeatType: "mirror",
+                        ease: "easeInOut",
+                    }}
+                />
+            </div>
 
             <GlassCard className="w-full max-w-md relative z-10 border-border bg-surface" noPadding>
                 <div className="p-6 md:p-8 text-center border-b border-border">
-                    <div className="w-12 h-12 bg-primary text-background rounded-xl mx-auto flex items-center justify-center shadow-none mb-4 md:mb-6">
-                        <Lock className="w-6 h-6" />
+                    <div className="w-20 h-20 bg-transparent rounded-2xl mx-auto flex items-center justify-center mb-4 md:mb-6">
+                        <img src="/icons/icon-192x192.png" alt="Attend Sight Logo" className="w-full h-full object-contain drop-shadow-lg" />
                     </div>
                     <h2 className="text-lg md:text-xl font-bold text-text">Welcome Back</h2>
                     <p className="text-zinc-500 text-sm mt-1.5">Sign in to access your attendance.</p>
@@ -97,7 +117,7 @@ export const Login: React.FC = () => {
                 </div>
             </GlassCard>
 
-            <div className="mt-8 text-zinc-600 text-xs">
+            <div className="mt-8 text-zinc-600 text-xs text-center z-10">
                 © 2024 Attend Sight. Secure System.
             </div>
         </div>
