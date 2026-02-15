@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Calendar, ChevronLeft, ChevronRight, CheckCircle, XCircle, Clock, MapPin, X, MinusCircle } from 'lucide-react';
 import { ScheduleItem, AttendanceRecord, AttendanceStatus } from '../types';
+import { compareTimes } from '../utils/timeUtils';
 import { Button } from './ui/Button';
 import { GlassCard } from './ui/GlassCard';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
@@ -20,7 +21,7 @@ export const ScheduleList: React.FC<ScheduleListProps> = ({ schedule, records, o
 
   const todaysClasses = schedule
     .filter(item => item.day.toLowerCase() === currentDayName.toLowerCase())
-    .sort((a, b) => a.startTime.localeCompare(b.startTime));
+    .sort((a, b) => compareTimes(a.startTime, b.startTime));
 
   const getRecordForClass = (scheduleId: string) => {
     const dateStr = selectedDate.toISOString().split('T')[0];
