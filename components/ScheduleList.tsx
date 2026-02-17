@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Calendar, ChevronLeft, ChevronRight, CheckCircle, XCircle, Clock, MapPin, X, MinusCircle } from 'lucide-react';
 import { ScheduleItem, AttendanceRecord, AttendanceStatus } from '../types';
 import { compareTimes } from '../utils/timeUtils';
@@ -48,19 +48,34 @@ export const ScheduleList: React.FC<ScheduleListProps> = ({ schedule, records, o
     setSelectedDate(newDate);
   };
 
-  const getWeekDates = () => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const calendarDates = useMemo(() => {
     const dates: Date[] = [];
-    const start = new Date(selectedDate);
-    start.setDate(start.getDate() - 3);
-    for (let i = 0; i < 7; i++) {
+    const start = new Date();
+    // 14 days before today to 30 days after today
+    start.setDate(start.getDate() - 14);
+    for (let i = 0; i < 45; i++) {
       const d = new Date(start);
       d.setDate(start.getDate() + i);
       dates.push(d);
     }
     return dates;
-  };
+  }, []);
 
-  const weekDates = getWeekDates();
+  useEffect(() => {
+    if (scrollRef.current) {
+      const selectedElement = scrollRef.current.querySelector('[data-selected="true"]');
+      if (selectedElement) {
+        selectedElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'center'
+        });
+      }
+    }
+  }, [selectedDate]);
+
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -88,29 +103,42 @@ export const ScheduleList: React.FC<ScheduleListProps> = ({ schedule, records, o
   return (
     <GlassCard className="overflow-hidden bg-surface border-border h-full flex flex-col" noPadding>
       {/* Mobile: Horizontal Date Picker */}
-      <div className="md:hidden border-b border-border shrink-0">
-        <div className="flex items-center px-3 py-2.5 gap-1.5 overflow-x-auto scrollbar-hide">
-          {weekDates.map((date) => {
+      <div className="md:hidden border-b border-border shrink-0 bg-surface/50 backdrop-blur-md sticky top-0 z-20">
+        <div
+          ref={scrollRef}
+          className="flex items-center overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth select-none touch-pan-x py-5"
+        >
+          {calendarDates.map((date, idx) => {
             const isSelected = date.toDateString() === selectedDate.toDateString();
             const isToday = date.toDateString() === today.toDateString();
             const dayShort = days[date.getDay()].substring(0, 3);
             return (
               <button
                 key={date.toISOString()}
+                data-selected={isSelected}
                 onClick={() => setSelectedDate(new Date(date))}
-                className={`flex flex-col items-center flex-1 min-w-[44px] py-2 rounded-xl transition-all ${isSelected
-                  ? 'bg-primary text-background shadow-sm'
-                  : isToday
-                    ? 'bg-primary/10'
-                    : 'active:bg-black/5 dark:active:bg-white/5'
+                style={{
+                  marginLeft: idx === 0 ? '42.8571%' : 0,
+                  marginRight: idx === calendarDates.length - 1 ? '42.8571%' : 0,
+                  flex: '0 0 14.2857%'
+                }}
+                className={`flex flex-col items-center shrink-0 relative transition-all duration-300 snap-center outline-none ${isSelected ? 'scale-110' : 'opacity-60 scale-95'
                   }`}
               >
-                <span className={`text-[10px] font-bold uppercase tracking-wide ${isSelected ? 'text-background/80' : 'text-zinc-400'}`}>
-                  {dayShort}
-                </span>
-                <span className={`text-base font-bold leading-tight ${isSelected ? 'text-background' : 'text-text'}`}>
-                  {date.getDate()}
-                </span>
+                <div className={`flex flex-col items-center justify-center p-2.5 rounded-2xl w-full max-w-[54px] aspect-square transition-all duration-300 ${isSelected
+                  ? 'bg-primary text-background shadow-2xl shadow-primary/30 font-bold'
+                  : 'bg-transparent font-medium'
+                  }`}>
+                  <span className={`text-[11px] uppercase tracking-[0.1em] mb-0.5 ${isSelected ? 'text-background/90' : 'text-zinc-500'}`}>
+                    {dayShort}
+                  </span>
+                  <span className={`text-xl leading-none ${isSelected ? 'text-background' : 'text-text'}`}>
+                    {date.getDate()}
+                  </span>
+                  {isToday && (
+                    <div className={`absolute -bottom-1.5 w-1 h-1 rounded-full transition-colors duration-300 ${isSelected ? 'bg-background' : 'bg-primary'}`} />
+                  )}
+                </div>
               </button>
             );
           })}
