@@ -161,9 +161,9 @@ export const Register: React.FC = () => {
                 </div>
             </GlassCard>
 
-            <div className="mt-8 text-zinc-600 text-xs">
-                © 2024 Attend Sight. Secure System.
-            </div>
+            <p className="mt-8 text-center text-xs text-zinc-500">
+                &copy; 2026 Attend Sight. Secure System.
+            </p>
         </div>
     );
 };

@@ -118,7 +118,7 @@ export const Login: React.FC = () => {
             </GlassCard>
 
             <div className="mt-8 text-zinc-600 text-xs text-center z-10">
-                © 2024 Attend Sight. Secure System.
+                © 2026 Attend Sight. Secure System.
             </div>
         </div>
     );
