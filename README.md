@@ -37,14 +37,14 @@ The application has been designed with a "Mobile-First" approach, ensuring a nat
         <b>Dashboard & Overview</b>
       </td>
       <td align="center">
-        <img src="public/icons/IMG_20260222_195344.jpg" alt="Mobile Stats View" width="250"/>
+        <img src="public/icons/IMG_20260222_195344.jpg" alt="Weekly Schedule View" width="250"/>
         <br />
-        <b>Attendance Stats</b>
+        <b>Weekly Schedule</b>
       </td>
       <td align="center">
-        <img src="public/icons/IMG_20260222_195330.jpg" alt="AI Schedule Upload" width="250"/>
+        <img src="public/icons/IMG_20260222_195330.jpg" alt="Sign In Screen" width="250"/>
         <br />
-        <b>AI Schedule Upload</b>
+        <b>Sign In & Auth</b>
       </td>
     </tr>
   </table>
