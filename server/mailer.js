@@ -6,7 +6,10 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
+
+if (process.env.NODE_ENV !== 'production') {
+    dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
+}
 
 // Lazy create transport to allow env vars to load
 let transporter;
@@ -15,6 +18,7 @@ const getTransporter = () => {
     if (!transporter) {
         if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
             console.error("GMAIL_USER or GMAIL_APP_PASSWORD missing");
+            console.log("Current env keys available:", Object.keys(process.env).filter(k => k.includes('GMAIL')));
         }
         transporter = nodemailer.createTransport({
             service: 'gmail',
